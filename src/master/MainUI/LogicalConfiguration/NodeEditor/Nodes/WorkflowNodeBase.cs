@@ -89,12 +89,12 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         /// <summary>
         /// 执行输入端口
         /// </summary>
-        protected STNodeOption InputExecution;
+        public STNodeOption InputExecution;
 
         /// <summary>
         /// 执行输出端口 (普通流程)
         /// </summary>
-        protected STNodeOption OutputExecution;
+        public STNodeOption OutputExecution;
 
         #endregion
 

@@ -51,12 +51,12 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         /// <summary>
         /// True 分支输出
         /// </summary>
-        protected STNodeOption OutputTrue;
+        public STNodeOption OutputTrue;
 
         /// <summary>
         /// False 分支输出
         /// </summary>
-        protected STNodeOption OutputFalse;
+        public STNodeOption OutputFalse;
 
         #endregion
 
@@ -438,7 +438,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         /// <summary>
         /// 超时输出
         /// </summary>
-        protected STNodeOption OutputTimeout;
+        public STNodeOption OutputTimeout;
 
         #endregion
 

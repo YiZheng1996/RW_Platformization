@@ -348,14 +348,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
         /// </summary>
         private void ConnectNodes(WorkflowNodeBase from, WorkflowNodeBase to)
         {
-            if (from.OutputOptions.Count > 0 && to.InputOptions.Count > 0)
-            {
-                var fromOption = from.OutputOptions[0];
-                var toOption = to.InputOptions[0];
-
-                // STNodeEditor 的连接方法
-                fromOption.ConnectOption(toOption);
-            }
+            from.ConnectTo(to);
         }
 
         /// <summary>
@@ -363,19 +356,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
         /// </summary>
         private void ConnectConditionNode(ConditionNode condNode, bool isTrueBranch, WorkflowNodeBase target)
         {
-            if (target.InputOptions.Count == 0) return;
+            if (target?.InputExecution == null) return;
 
-            var toOption = target.InputOptions[0];
-
-            if (isTrueBranch && condNode.OutputOptions.Count > 0)
+            if (isTrueBranch)
             {
-                // True 分支是第一个输出
-                condNode.OutputOptions[0].ConnectOption(toOption);
+                // True 分支 - 使用第一个输出
+                condNode.OutputTrue?.ConnectOption(target.InputExecution);
             }
-            else if (!isTrueBranch && condNode.OutputOptions.Count > 1)
+            else
             {
-                // False 分支是第二个输出
-                condNode.OutputOptions[1].ConnectOption(toOption);
+                // False 分支 - 使用第二个输出
+                condNode.OutputFalse?.ConnectOption(target.InputExecution);
             }
         }
 
@@ -492,9 +483,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
                     continue;
 
                 bool hasInput = false;
-                for (int i = 0; i < node.InputOptions.Count; i++)
+                for (int i = 0; i < node.InputOptionsCount; i++)
                 {
-                    if (node.InputOptions[i].ConnectionCount > 0)
+                    if (node.InputExecution.ConnectionCount > 0)
                     {
                         hasInput = true;
                         break;
