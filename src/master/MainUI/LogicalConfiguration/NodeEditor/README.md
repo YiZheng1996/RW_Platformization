@@ -1,212 +1,397 @@
-# NodeEditor 可视化工作流编辑器
+# STNodeEditor 工作流设计器
 
-## 📁 文件结构
+基于 **STNodeEditor** 的可视化工作流设计器，专为 WinForms 工业控制应用设计。
+
+## 📦 目录结构
 
 ```
-NodeEditor/
-├── Core/                          # 核心基础类
-│   ├── NodeSocket.cs              # 节点端口类
-│   ├── NodeConnection.cs          # 节点连接类
-│   ├── WorkflowNodeBase.cs        # 节点基类
-│   └── ParameterModels.cs         # 参数模型定义
+STNodeWorkflow/
+├── Core/                               # 核心功能
+│   ├── WorkflowNodeFactory.cs          # 节点工厂 - 创建和管理节点
+│   ├── WorkflowGraphConverter.cs       # 图转换器 - 节点图 ↔ ChildModel
+│   ├── NodeConfigAdapter.cs            # 配置适配器 - 节点配置窗体
+│   └── WorkflowExecutionVisualizer.cs  # 执行可视化 - 实时状态显示
 │
-├── Nodes/                         # 具体节点实现
-│   ├── ControlNodes.cs            # 控制节点（开始/结束）
-│   ├── LogicNodes.cs              # 逻辑节点（条件/循环/延时等）
-│   ├── PLCNodes.cs                # PLC通信节点
-│   └── DataNodes.cs               # 数据操作节点
+├── Nodes/                              # 节点定义
+│   ├── WorkflowNodeBase.cs             # 节点基类
+│   ├── SpecialNodes.cs                 # 特殊节点 (开始/结束/注释)
+│   ├── ControlFlowNodes.cs             # 控制流节点 (条件/循环/等待)
+│   └── OperationNodes.cs               # 操作节点 (延时/PLC/变量)
 │
-├── Controls/                      # UI控件
-│   ├── NodeEditorControl.cs       # 节点编辑器主控件
-│   ├── NodeToolboxControl.cs      # 工具箱控件
-│   └── NodePropertyPanel.cs       # 属性面板控件
+├── Controls/
+│   └── WorkflowDesignerPanel.cs        # 设计器面板控件
 │
-├── Services/                      # 服务类
-│   ├── NodeFactory.cs             # 节点工厂
-│   ├── WorkflowDocument.cs        # 工作流文档模型
-│   ├── NodeExecutionAdapter.cs    # 执行适配器
-│   └── ServiceInterfaces.cs       # 服务接口定义
+├── Forms/
+│   └── WorkflowDesignerForm.cs         # 设计器窗体
 │
-├── Converters/                    # 转换器
-│   └── WorkflowConverter.cs       # Node ↔ ChildModel 转换
-│
-└── Forms/                         # 窗体
-    └── frmNodeWorkflowDesigner.cs # 主设计器窗体
+├── IntegrationExample.cs               # 集成示例代码
+└── README.md                           # 本文档
 ```
 
 ## 🚀 快速开始
 
-### 1. 添加引用
+### 1. 安装 NuGet 包
 
-将 `NodeEditor` 文件夹复制到项目的 `LogicalConfiguration` 目录下。
+```bash
+# Package Manager Console
+Install-Package ST.Library.UI
 
-### 2. 添加命名空间引用
-
-```csharp
-using MainUI.LogicalConfiguration.NodeEditor.Core;
-using MainUI.LogicalConfiguration.NodeEditor.Controls;
-using MainUI.LogicalConfiguration.NodeEditor.Services;
-using MainUI.LogicalConfiguration.NodeEditor.Forms;
+# 或 .NET CLI
+dotnet add package ST.Library.UI
 ```
 
-### 3. 打开设计器窗体
+### 2. 添加代码文件
+
+将 `STNodeWorkflow` 文件夹复制到你的项目中，调整命名空间。
+
+### 3. 打开设计器
 
 ```csharp
-// 在主界面中添加按钮打开节点编辑器
-private void btnOpenNodeEditor_Click(object sender, EventArgs e)
+using MainUI.LogicalConfiguration.NodeEditor.Forms;
+
+// 方式1: 打开独立窗口
+var designerForm = new WorkflowDesignerForm();
+designerForm.Show();
+
+// 方式2: 带初始数据
+var steps = workflowStateService.GetSteps();
+var designerForm = new WorkflowDesignerForm(steps, (result) =>
 {
-    var workflowState = new WorkflowStateService(
-        modelTypeName: "产品类型",
-        modelName: "产品型号",
-        itemName: "测试项目"
-    );
-    
-    using var designer = new frmNodeWorkflowDesigner(workflowState);
-    designer.ShowDialog();
+    // 保存回调
+    workflowStateService.ClearSteps();
+    foreach (var step in result)
+    {
+        workflowStateService.AddStep(step);
+    }
+});
+designerForm.Show();
+
+// 方式3: 对话框模式
+var result = new WorkflowDesignerForm(steps).ShowDialogAndGetResult();
+if (result != null)
+{
+    // 用户点击确定，处理结果
 }
 ```
-
-## 📝 使用说明
-
-### 节点操作
-
-| 操作 | 方法 |
-|------|------|
-| 添加节点 | 从左侧工具箱拖拽到画布 |
-| 删除节点 | 选中后按 Delete 键 |
-| 移动节点 | 拖拽节点标题栏 |
-| 多选节点 | Ctrl + 点击 或 框选 |
-| 连接节点 | 从输出端口拖拽到输入端口 |
-| 编辑参数 | 双击节点 或 在右侧属性面板编辑 |
-
-### 视图操作
-
-| 操作 | 方法 |
-|------|------|
-| 平移视图 | 中键/右键拖拽 |
-| 缩放视图 | 鼠标滚轮 |
-| 适应视图 | 点击工具栏"适应"按钮 |
-| 重置视图 | 点击工具栏"重置"按钮 |
-
-### 快捷键
-
-| 快捷键 | 功能 |
-|--------|------|
-| Ctrl+S | 保存工作流 |
-| Ctrl+Z | 撤销 |
-| Ctrl+Y | 重做 |
-| Ctrl+A | 全选 |
-| Ctrl+C | 复制 |
-| Ctrl+V | 粘贴 |
-| Delete | 删除选中 |
-| Escape | 取消选择 |
 
 ## 🎨 节点类型
 
-### 控制节点
-- **开始节点** - 工作流入口点（绿色）
-- **结束节点** - 工作流终点（红色）
+### 特殊节点
+| 节点 | StepName | 说明 |
+|------|----------|------|
+| 🚀 开始 | `Start` | 工作流起点 |
+| ✅ 结束 | `End` | 工作流终点 |
+| 📝 注释 | `Comment` | 添加说明文字 |
 
-### 逻辑节点
-- **延时等待** - 等待指定时间（灰色）
-- **条件判断** - 条件分支，True/False两个出口（橙色）
-- **循环** - 循环执行子步骤（紫色）
-- **等待稳定** - 等待数值稳定（深蓝灰）
-- **跳出循环** - Break（深红色）
-- **继续循环** - Continue（深绿色）
+### 控制流节点
+| 节点 | StepName | 说明 |
+|------|----------|------|
+| ❓ 条件判断 | `ConditionJudge` | 根据条件分支 |
+| 🔄 循环 | `CycleBegins` | 循环执行步骤 |
+| ⏳ 等待稳定 | `Waitingforstability` | 等待值稳定 |
 
-### 通信节点
-- **读取PLC** - 从PLC读取数据（蓝色）
-- **写入PLC** - 向PLC写入数据（紫色）
+### 操作节点
+| 节点 | StepName | 说明 |
+|------|----------|------|
+| ⏱️ 延时等待 | `DelayWait` | 暂停执行 |
+| 📝 变量赋值 | `VariableAssign` | 设置变量值 |
+| 📥 读取PLC | `PLCRead` | 从PLC读取 |
+| 📤 写入PLC | `PLCWrite` | 向PLC写入 |
+| 💬 消息通知 | `MessageNotify` | 发送消息 |
+| 📺 实时监控 | `MonitorTool` | 显示监控窗口 |
 
-### 数据节点
-- **变量赋值** - 设置变量值（青色）
-- **变量定义** - 定义新变量（深青色）
-- **消息通知** - 显示消息（黄色）
+## 🔧 与现有项目集成
 
-## 🔧 扩展开发
+### 1. 处理参数类冲突
 
-### 添加自定义节点
-
-1. 继承 `WorkflowNodeBase` 基类：
+如果项目已有 `Parameter_XXX` 类，删除 `OperationNodes.cs` 底部的参数类定义，添加引用：
 
 ```csharp
-[Serializable]
-public class MyCustomNode : WorkflowNodeBase
-{
-    public override string NodeType => "MyCustom";
-    public override Color NodeColor => Color.FromArgb(100, 150, 200);
-    public override string IconName => "icon_custom.png";
-
-    public MyCustomNode()
-    {
-        DisplayName = "我的自定义节点";
-        InputSockets.Add(new NodeSocket("In", SocketType.Input));
-        OutputSockets.Add(new NodeSocket("Out", SocketType.Output));
-    }
-
-    public override string GetParameterPreview()
-    {
-        return "自定义预览文本";
-    }
-
-    public override WorkflowNodeBase Clone()
-    {
-        var clone = new MyCustomNode();
-        CopyBasicProperties(clone);
-        return clone;
-    }
-}
+using MainUI.LogicalConfiguration.Parameter;
 ```
 
-2. 注册到节点工厂：
+### 2. 注册现有配置窗体
 
 ```csharp
-NodeFactory.RegisterNodeType("MyCustom", () => new MyCustomNode());
+// 在程序启动时注册
+NodeConfigAdapter.Instance.RegisterFormFactory("DelayWait", node =>
+{
+    var form = new Form_DelayTime();
+    form.Parameter = node.StepParameter as Parameter_DelayTime 
+                     ?? new Parameter_DelayTime();
+    return form;
+});
+
+NodeConfigAdapter.Instance.RegisterFormFactory("ConditionJudge", node =>
+{
+    var form = new Form_Detection();
+    form.Parameter = node.StepParameter as Parameter_Detection 
+                     ?? new Parameter_Detection();
+    return form;
+});
+
+// ... 其他节点
 ```
 
-### 自定义参数配置窗体
-
-实现 `IFormService` 接口：
+### 3. 嵌入到现有窗体
 
 ```csharp
-public class MyFormService : IFormService
+public partial class frmLogicalConfiguration : Form
 {
-    public Form CreateParameterForm(string nodeType, IWorkflowStateService workflowState)
+    private WorkflowDesignerPanel _nodeDesigner;
+
+    private void InitializeNodeDesigner()
     {
-        return nodeType switch
+        _nodeDesigner = new WorkflowDesignerPanel
         {
-            "ReadPLC" => new Form_ReadPLC(workflowState),
-            "WritePLC" => new Form_WritePLC(workflowState),
-            "ConditionJudge" => new Form_Detection(workflowState),
-            _ => null
+            Dock = DockStyle.Fill
+        };
+
+        // 添加到容器面板
+        panelDesigner.Controls.Add(_nodeDesigner);
+
+        // 加载现有步骤
+        var steps = _workflowStateService.GetSteps();
+        _nodeDesigner.LoadFromChildModels(steps);
+
+        // 监听变化
+        _nodeDesigner.WorkflowChanged += (s, e) => SyncToWorkflowState();
+
+        // 双击节点打开配置
+        _nodeDesigner.NodeDoubleClick += (s, e) =>
+        {
+            var result = NodeConfigAdapter.Instance.OpenConfigForm(e.Node, this);
+            if (result.Success)
+            {
+                e.Node.RefreshDisplay();
+            }
+            e.Handled = true;
         };
     }
+
+    private void SyncToWorkflowState()
+    {
+        var steps = _nodeDesigner.ExportToChildModels();
+        _workflowStateService.ClearSteps();
+        foreach (var step in steps)
+        {
+            _workflowStateService.AddStep(step);
+        }
+    }
 }
 ```
 
-## ⚠️ 注意事项
+## 📊 执行状态可视化
 
-1. **参数类型兼容** - 确保 `ParameterModels.cs` 中的参数类与现有系统一致
-2. **JSON序列化** - 需要安装 `Newtonsoft.Json` NuGet包
-3. **日志支持** - 可选依赖 `Microsoft.Extensions.Logging`
+```csharp
+// 创建可视化器
+var visualizer = new WorkflowExecutionVisualizer(designerPanel.NodeEditor);
 
-## 📦 依赖项
+// 开始执行
+visualizer.StartExecution();
 
-```xml
-<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.0" />
+// 更新节点状态
+visualizer.SetNodeExecuting(nodeId);      // 执行中
+visualizer.SetNodeCompleted(nodeId);       // 完成
+visualizer.SetNodeCompleted(nodeId, false); // 失败
+visualizer.SetNodeSkipped(nodeId);         // 跳过
+
+// 停止执行
+visualizer.StopExecution();
 ```
 
-## 🔄 与现有系统集成
+### 与 StepExecutionManager 集成
 
-本节点编辑器设计为与现有 `LogicalConfiguration` 系统兼容：
+```csharp
+var tracker = new WorkflowExecutionTracker(visualizer);
 
-- `ChildModel` 保持不变
-- `Parameter_*` 参数类保持不变  
-- 通过 `WorkflowConverter` 实现双向转换
-- 可与现有表格编辑器并存
+// 构建映射
+tracker.BuildStepMapping(steps, nodes);
+
+// 在步骤执行回调中
+stepExecutionManager.StepStarted += (stepNum) => tracker.OnStepStarted(stepNum);
+stepExecutionManager.StepCompleted += (stepNum, success) => tracker.OnStepCompleted(stepNum, success);
+```
+
+## 🎯 自定义节点
+
+```csharp
+[STNode("自定义/我的节点", "工作流设计器", "", "", "自定义节点说明")]
+public class MyCustomNode : WorkflowNodeBase
+{
+    public override string StepName => "MyCustomStep";
+    public override string DisplayName => "我的节点";
+    public override string CategoryPath => "自定义";
+    public override string Description => "这是一个自定义节点";
+
+    // 自定义参数
+    public MyCustomParameter Parameter
+    {
+        get => StepParameter as MyCustomParameter;
+        set => StepParameter = value;
+    }
+
+    public override string ConfigSummary
+    {
+        get
+        {
+            if (Parameter == null) return "未配置";
+            return $"配置: {Parameter.SomeValue}";
+        }
+    }
+
+    protected override void OnCreate()
+    {
+        base.OnCreate();
+        this.Title = "🔧 我的节点";
+        this.Size = new Size(180, 70);
+    }
+
+    protected override Color GetTitleColor()
+    {
+        return Color.FromArgb(200, 100, 149, 237);
+    }
+
+    protected override void InitializeParameter()
+    {
+        Parameter = new MyCustomParameter();
+    }
+
+    protected override void LoadParameterFromJson(string json)
+    {
+        Parameter = JsonConvert.DeserializeObject<MyCustomParameter>(json);
+    }
+
+    public override Type GetParameterType()
+    {
+        return typeof(MyCustomParameter);
+    }
+}
+
+// 注册自定义节点
+WorkflowNodeFactory.RegisterNode<MyCustomNode>();
+```
+
+## ⌨️ 快捷键
+
+| 快捷键 | 功能 |
+|--------|------|
+| `Ctrl+N` | 新建工作流 |
+| `Ctrl+O` | 打开工作流 |
+| `Ctrl+S` | 保存工作流 |
+| `Ctrl+A` | 全选节点 |
+| `Delete` | 删除选中节点 |
+| `F5` | 验证工作流 |
+| `鼠标滚轮` | 缩放画布 |
+| `中键拖动` | 移动画布 |
+| `双击节点` | 打开配置 |
+
+## 📁 文件格式
+
+### .stn 格式
+STNodeEditor 原生格式，包含完整的节点图信息：
+- 节点位置和大小
+- 连接关系
+- 节点参数
+
+### .json 格式
+ChildModel 列表格式，与现有系统兼容：
+```json
+[
+  {
+    "StepNum": 1,
+    "StepName": "DelayWait",
+    "StepParameter": { "T": 1000 },
+    "Remark": "等待1秒",
+    "Status": 0
+  }
+]
+```
+
+## 🔍 验证功能
+
+设计器内置验证功能：
+- ✅ 检查开始节点存在
+- ✅ 检查结束节点存在  
+- ⚠️ 检测孤立节点
+- ⚠️ 检测未配置节点
+- ❌ 检测循环依赖
+
+## 📝 外观定制
+
+### 节点颜色
+```csharp
+protected override Color GetTitleColor()
+{
+    return Color.FromArgb(200, 74, 144, 226);
+}
+```
+
+### 编辑器样式
+```csharp
+_nodeEditor.BackColor = Color.FromArgb(30, 30, 32);
+_nodeEditor.GridColor = Color.FromArgb(50, 50, 52);
+_nodeEditor.Curvature = 0.3f; // 连线曲率
+```
+
+### 数据类型颜色
+```csharp
+_nodeEditor.SetTypeColor(typeof(int), Color.DodgerBlue);
+_nodeEditor.SetTypeColor(typeof(string), Color.Yellow);
+_nodeEditor.SetTypeColor(typeof(ExecutionFlow), Color.White);
+```
+
+## 📋 API 参考
+
+### WorkflowDesignerPanel
+
+| 方法 | 说明 |
+|------|------|
+| `NewWorkflow()` | 创建新工作流 |
+| `LoadWorkflow(path)` | 从文件加载 |
+| `SaveWorkflow(path)` | 保存到文件 |
+| `LoadFromChildModels(list)` | 从步骤列表加载 |
+| `ExportToChildModels()` | 导出为步骤列表 |
+| `ValidateWorkflow()` | 验证工作流 |
+| `AddNode(stepName, x, y)` | 添加节点 |
+
+### WorkflowGraphConverter
+
+| 方法 | 说明 |
+|------|------|
+| `ConvertToChildModels()` | 转换为步骤列表 |
+| `LoadFromChildModels(list)` | 从步骤列表加载 |
+| `AutoLayoutNodes()` | 自动布局 |
+| `ValidateGraph()` | 验证图结构 |
+
+### WorkflowNodeFactory
+
+| 方法 | 说明 |
+|------|------|
+| `CreateNode(stepName)` | 根据名称创建节点 |
+| `CreateNodeFromChildModel(model)` | 从模型创建节点 |
+| `GetNodesByCategory()` | 按分类获取节点 |
+| `RegisterNode<T>()` | 注册自定义节点 |
+
+## 🐛 故障排除
+
+### 节点不显示在树视图
+确保节点类有 `[STNode]` 特性，并且已被扫描到。
+
+### 连接无法创建
+检查数据类型是否匹配。执行流使用 `ExecutionFlowType`。
+
+### 参数无法保存
+确保参数类可序列化（有无参构造函数，属性可读写）。
+
+### 配置窗体不弹出
+检查 `NodeConfigAdapter` 是否注册了对应的窗体工厂。
+
+## 📄 许可证
+
+本项目使用 MIT 许可证。STNodeEditor 库遵循其原始许可协议。
 
 ---
 
-如有问题，请参考代码注释或联系开发团队。
+**作者**: Claude AI Assistant  
+**日期**: 2025年12月

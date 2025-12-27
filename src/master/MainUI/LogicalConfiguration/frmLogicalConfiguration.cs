@@ -1,6 +1,7 @@
 ﻿using AntdUI;
 using MainUI.LogicalConfiguration.Controls;
 using MainUI.LogicalConfiguration.LogicalManager;
+using MainUI.LogicalConfiguration.NodeEditor;
 using MainUI.LogicalConfiguration.NodeEditor.Forms;
 using MainUI.LogicalConfiguration.Services;
 using Microsoft.Extensions.DependencyInjection;
@@ -706,8 +707,7 @@ namespace MainUI.LogicalConfiguration
         /// <param name="e"></param>
         private void BtnOpenNodeEditor_Click(object sender, EventArgs e)
         {
-            using var designer = new FrmNodeWorkflowDesigner(_workflowState);
-            designer.ShowDialog();
+            IntegrationExample.OpenDesignerWindow(_workflowState.GetSteps());
         }
 
         private void BtnGeneral_Click(object sender, EventArgs e)
