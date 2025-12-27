@@ -63,6 +63,7 @@
             btnClose = new UISymbolButton();
             btnExecute = new UISymbolButton();
             btnSave = new UISymbolButton();
+            btnOpenNodeEditor = new UISymbolButton();
             ((System.ComponentModel.ISupportInitialize)splitContainerMain).BeginInit();
             splitContainerMain.Panel1.SuspendLayout();
             splitContainerMain.Panel2.SuspendLayout();
@@ -498,6 +499,7 @@
             // pnlButtons
             // 
             pnlButtons.BackColor = Color.White;
+            pnlButtons.Controls.Add(btnOpenNodeEditor);
             pnlButtons.Controls.Add(BtnSystemParams);
             pnlButtons.Controls.Add(BtnVariableMonitor);
             pnlButtons.Controls.Add(BtnPointDefine);
@@ -533,7 +535,7 @@
             BtnSystemParams.FillSelectedColor = Color.FromArgb(149, 154, 164);
             BtnSystemParams.Font = new Font("微软雅黑", 12F);
             BtnSystemParams.Image = (Image)resources.GetObject("BtnSystemParams.Image");
-            BtnSystemParams.Location = new Point(373, 10);
+            BtnSystemParams.Location = new Point(667, 12);
             BtnSystemParams.MinimumSize = new Size(1, 1);
             BtnSystemParams.Name = "BtnSystemParams";
             BtnSystemParams.RectColor = Color.FromArgb(55, 71, 79);
@@ -546,6 +548,7 @@
             BtnSystemParams.TabIndex = 6;
             BtnSystemParams.Text = "系统参数";
             BtnSystemParams.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            BtnSystemParams.Visible = false;
             // 
             // BtnVariableMonitor
             // 
@@ -560,7 +563,7 @@
             BtnVariableMonitor.FillSelectedColor = Color.FromArgb(149, 154, 164);
             BtnVariableMonitor.Font = new Font("微软雅黑", 12F);
             BtnVariableMonitor.Image = (Image)resources.GetObject("BtnVariableMonitor.Image");
-            BtnVariableMonitor.Location = new Point(129, 10);
+            BtnVariableMonitor.Location = new Point(792, 11);
             BtnVariableMonitor.MinimumSize = new Size(1, 1);
             BtnVariableMonitor.Name = "BtnVariableMonitor";
             BtnVariableMonitor.RectColor = Color.FromArgb(55, 71, 79);
@@ -573,6 +576,7 @@
             BtnVariableMonitor.TabIndex = 5;
             BtnVariableMonitor.Text = "变量监控";
             BtnVariableMonitor.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            BtnVariableMonitor.Visible = false;
             // 
             // BtnPointDefine
             // 
@@ -587,7 +591,7 @@
             BtnPointDefine.FillSelectedColor = Color.FromArgb(149, 154, 164);
             BtnPointDefine.Font = new Font("微软雅黑", 12F);
             BtnPointDefine.Image = (Image)resources.GetObject("BtnPointDefine.Image");
-            BtnPointDefine.Location = new Point(251, 10);
+            BtnPointDefine.Location = new Point(123, 10);
             BtnPointDefine.MinimumSize = new Size(1, 1);
             BtnPointDefine.Name = "BtnPointDefine";
             BtnPointDefine.RectColor = Color.FromArgb(55, 71, 79);
@@ -707,6 +711,34 @@
             btnSave.Text = "保存配置";
             btnSave.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
             // 
+            // btnOpenNodeEditor
+            // 
+            btnOpenNodeEditor.Cursor = Cursors.Hand;
+            btnOpenNodeEditor.FillColor = Color.FromArgb(69, 90, 100);
+            btnOpenNodeEditor.FillColor2 = Color.FromArgb(55, 71, 79);
+            btnOpenNodeEditor.FillColorGradient = true;
+            btnOpenNodeEditor.FillColorGradientDirection = FlowDirection.LeftToRight;
+            btnOpenNodeEditor.FillDisableColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.FillHoverColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.FillPressColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.FillSelectedColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.Font = new Font("微软雅黑", 12F);
+            btnOpenNodeEditor.ForeDisableColor = Color.White;
+            btnOpenNodeEditor.Image = (Image)resources.GetObject("btnOpenNodeEditor.Image");
+            btnOpenNodeEditor.Location = new Point(239, 10);
+            btnOpenNodeEditor.MinimumSize = new Size(1, 1);
+            btnOpenNodeEditor.Name = "btnOpenNodeEditor";
+            btnOpenNodeEditor.RectColor = Color.FromArgb(55, 71, 79);
+            btnOpenNodeEditor.RectDisableColor = Color.FromArgb(55, 71, 79);
+            btnOpenNodeEditor.RectHoverColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.RectPressColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.RectSelectedColor = Color.FromArgb(149, 154, 164);
+            btnOpenNodeEditor.Size = new Size(122, 35);
+            btnOpenNodeEditor.Symbol = 0;
+            btnOpenNodeEditor.TabIndex = 7;
+            btnOpenNodeEditor.Text = "节点编辑器";
+            btnOpenNodeEditor.TipsFont = new Font("宋体", 9F, FontStyle.Regular, GraphicsUnit.Point, 134);
+            // 
             // FrmLogicalConfiguration
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -782,5 +814,6 @@
         private UISymbolButton BtnSystemParams;
         private UISymbolButton BtnVariableMonitor;
         private UISymbolButton BtnPointDefine;
+        private UISymbolButton btnOpenNodeEditor;
     }
 }

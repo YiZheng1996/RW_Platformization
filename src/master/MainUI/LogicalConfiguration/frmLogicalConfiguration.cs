@@ -1,10 +1,12 @@
 ﻿using AntdUI;
 using MainUI.LogicalConfiguration.Controls;
 using MainUI.LogicalConfiguration.LogicalManager;
+using MainUI.LogicalConfiguration.NodeEditor.Forms;
 using MainUI.LogicalConfiguration.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System.Text;
+using JsonManager = MainUI.LogicalConfiguration.LogicalManager.JsonManager;
 
 namespace MainUI.LogicalConfiguration
 {
@@ -167,6 +169,7 @@ namespace MainUI.LogicalConfiguration
                 btnClose.Click += BtnClose_Click;
                 btnVariableDefine.Click += BtnGeneral_Click;
                 BtnPointDefine.Click += BtnGeneral_Click;
+                btnOpenNodeEditor.Click += BtnOpenNodeEditor_Click;
                 BtnVariableMonitor.Click += BtnGeneral_Click;
                 BtnSystemParams.Click += BtnGeneral_Click;
 
@@ -181,6 +184,7 @@ namespace MainUI.LogicalConfiguration
                 throw;
             }
         }
+
 
         // 加载已存在的Json数据到DataGridView控件中
         private async void LoadStepsToGrid()
@@ -693,6 +697,17 @@ namespace MainUI.LogicalConfiguration
             }
 
             this.Close();
+        }
+
+        /// <summary>
+        /// 开节点编辑器
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void BtnOpenNodeEditor_Click(object sender, EventArgs e)
+        {
+            using var designer = new FrmNodeWorkflowDesigner(_workflowState);
+            designer.ShowDialog();
         }
 
         private void BtnGeneral_Click(object sender, EventArgs e)
