@@ -1,8 +1,5 @@
 using MainUI.LogicalConfiguration.Parameter;
 using ST.Library.UI.NodeEditor;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static MainUI.LogicalConfiguration.Parameter.Parameter_WritePLC;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
@@ -54,6 +51,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
             this.Title = "⏱️ 延时等待";
         }
+
+        //protected override void CreateDefaultPorts()
+        //{
+        //    // 输入在顶部
+        //    InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+        //    SetPortAlignment(InputExecution, PortAlignment.Top);
+
+        //    // 输出在底部
+        //    OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+        //    SetPortAlignment(OutputExecution, PortAlignment.Bottom);
+        //}
 
         protected override Color GetTitleColor()
         {
@@ -284,7 +292,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         {
             Parameter = new Parameter_WritePLC
             {
-                Items = new List<PLCWriteItem>()
+                Items = []
             };
         }
 

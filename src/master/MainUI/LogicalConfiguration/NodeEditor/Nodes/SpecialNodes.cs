@@ -33,8 +33,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            // 开始节点只有输出端口
+            // 开始节点只有输出端口，放在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         protected override void OnDrawBody(DrawingTools dt)
@@ -100,8 +101,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            // 结束节点只有输入端口
+            // 结束节点只有输入端口，放在顶部
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+            SetPortAlignment(InputExecution, PortAlignment.Top);
         }
 
         private void UpdateTitle()
