@@ -1,7 +1,8 @@
-using MainUI.LogicalConfiguration.NodeEditor.Core;
+﻿using MainUI.LogicalConfiguration.NodeEditor.Core;
 using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using ST.Library.UI.NodeEditor;
 using System.ComponentModel;
+using Timer = System.Windows.Forms.Timer;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 {
@@ -9,26 +10,19 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
     /// 工作流设计器面板 - 完整的节点编辑器控件
     /// 包含：节点树、节点编辑器、属性面板
     /// </summary>
-    public class WorkflowDesignerPanel : UserControl
+    public partial class WorkflowDesignerPanel : UserControl
     {
-        #region 控件
-
-        private SplitContainer _mainSplitContainer;
-        private SplitContainer _rightSplitContainer;
-        private STNodeEditor _nodeEditor;
-        private STNodeTreeView _nodeTreeView;
-        private STNodePropertyGrid _propertyGrid;
-        private Panel _toolbarPanel;
-        private Panel _leftPanel;
-        private ToolStrip _toolStrip;
-
-        #endregion
-
         #region 私有字段
 
         private WorkflowGraphConverter _converter;
         private string _currentFilePath;
         private bool _isDirty = false;
+
+        private TextBox _searchBox;
+        private Panel _searchPanel;
+        private PictureBox _miniMap;
+        private STNode _copiedNode;
+        private Point _lastRightClickPosition;
 
         #endregion
 
@@ -125,197 +119,29 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             InitializeNodeEditor();
             RegisterNodeTypes();
             BindEvents();
+
+            InitializeEnhancements();
+        }
+
+        private void InitializeEnhancements()
+        {
+            // 2. 使用增强的右键菜单
+            _nodeEditor.ContextMenuStrip = CreateEnhancedContextMenu();
+
+            // 3. 初始化缩放控制
+            InitializeZoomControls();
+
+            // 4. 初始化小地图（可选）
+            // InitializeMiniMap();
+
+            // 5. 绑定增强的键盘事件
+            _nodeEditor.KeyDown -= OnEditorKeyDown;  // 移除旧的
+            _nodeEditor.KeyDown += OnEditorKeyDownEnhanced;  // 使用新的
         }
 
         #endregion
 
         #region 初始化
-        private void InitializeComponent()
-        {
-            _leftPanel = new Panel();
-            _nodeTreeView = new STNodeTreeView();
-            _mainSplitContainer = new SplitContainer();
-            _nodeEditor = new STNodeEditor();
-            _propertyGrid = new STNodePropertyGrid();
-            _leftPanel.SuspendLayout();
-            ((ISupportInitialize)_mainSplitContainer).BeginInit();
-            _mainSplitContainer.Panel1.SuspendLayout();
-            _mainSplitContainer.Panel2.SuspendLayout();
-            _mainSplitContainer.SuspendLayout();
-            SuspendLayout();
-            // 
-            // _leftPanel
-            // 
-            _leftPanel.BackColor = Color.FromArgb(35, 35, 35);
-            _leftPanel.Controls.Add(_nodeTreeView);
-            _leftPanel.Dock = DockStyle.Left;
-            _leftPanel.Location = new Point(0, 0);
-            _leftPanel.Name = "_leftPanel";
-            _leftPanel.Size = new Size(250, 700);
-            _leftPanel.TabIndex = 0;
-            // 
-            // _nodeTreeView
-            // 
-            _nodeTreeView.AllowDrop = true;
-            _nodeTreeView.BackColor = Color.FromArgb(35, 35, 35);
-            _nodeTreeView.Dock = DockStyle.Fill;
-            _nodeTreeView.FolderCountColor = Color.FromArgb(40, 255, 255, 255);
-            _nodeTreeView.ForeColor = Color.FromArgb(220, 220, 220);
-            _nodeTreeView.ItemBackColor = Color.FromArgb(45, 45, 45);
-            _nodeTreeView.ItemHoverColor = Color.FromArgb(50, 125, 125, 125);
-            _nodeTreeView.Location = new Point(0, 0);
-            _nodeTreeView.MinimumSize = new Size(100, 60);
-            _nodeTreeView.Name = "_nodeTreeView";
-            _nodeTreeView.ShowFolderCount = true;
-            _nodeTreeView.Size = new Size(250, 700);
-            _nodeTreeView.TabIndex = 0;
-            _nodeTreeView.TextBoxColor = Color.FromArgb(30, 30, 30);
-            _nodeTreeView.TitleColor = Color.FromArgb(60, 60, 60);
-            // 
-            // _mainSplitContainer
-            // 
-            _mainSplitContainer.Dock = DockStyle.Fill;
-            _mainSplitContainer.Location = new Point(250, 0);
-            _mainSplitContainer.Name = "_mainSplitContainer";
-            // 
-            // _mainSplitContainer.Panel1
-            // 
-            _mainSplitContainer.Panel1.Controls.Add(_nodeEditor);
-            // 
-            // _mainSplitContainer.Panel2
-            // 
-            _mainSplitContainer.Panel2.Controls.Add(_propertyGrid);
-            _mainSplitContainer.Size = new Size(950, 700);
-            _mainSplitContainer.SplitterDistance = 766;
-            _mainSplitContainer.SplitterWidth = 5;
-            _mainSplitContainer.TabIndex = 0;
-            // 
-            // _nodeEditor
-            // 
-            _nodeEditor.AllowDrop = true;
-            _nodeEditor.BackColor = Color.FromArgb(34, 34, 34);
-            _nodeEditor.Curvature = 0.3F;
-            _nodeEditor.Dock = DockStyle.Fill;
-            _nodeEditor.GridColor = Color.FromArgb(60, 60, 60);
-            _nodeEditor.Location = new Point(0, 0);
-            _nodeEditor.LocationBackColor = Color.FromArgb(120, 0, 0, 0);
-            _nodeEditor.MarkBackColor = Color.FromArgb(180, 0, 0, 0);
-            _nodeEditor.MarkForeColor = Color.FromArgb(180, 0, 0, 0);
-            _nodeEditor.MinimumSize = new Size(100, 100);
-            _nodeEditor.Name = "_nodeEditor";
-            _nodeEditor.Size = new Size(766, 700);
-            _nodeEditor.TabIndex = 0;
-            // 
-            // _propertyGrid
-            // 
-            _propertyGrid.BackColor = Color.FromArgb(35, 35, 35);
-            _propertyGrid.DescriptionColor = Color.FromArgb(200, 184, 134, 11);
-            _propertyGrid.Dock = DockStyle.Fill;
-            _propertyGrid.ErrorColor = Color.FromArgb(200, 165, 42, 42);
-            _propertyGrid.ForeColor = Color.White;
-            _propertyGrid.ItemHoverColor = Color.FromArgb(50, 125, 125, 125);
-            _propertyGrid.ItemValueBackColor = Color.FromArgb(80, 80, 80);
-            _propertyGrid.Location = new Point(0, 0);
-            _propertyGrid.MinimumSize = new Size(120, 50);
-            _propertyGrid.Name = "_propertyGrid";
-            _propertyGrid.ShowTitle = true;
-            _propertyGrid.Size = new Size(179, 700);
-            _propertyGrid.TabIndex = 0;
-            _propertyGrid.TitleColor = Color.FromArgb(127, 0, 0, 0);
-            // 
-            // WorkflowDesignerPanel
-            // 
-            Controls.Add(_mainSplitContainer);
-            Controls.Add(_leftPanel);
-            Name = "WorkflowDesignerPanel";
-            Size = new Size(1200, 700);
-            _leftPanel.ResumeLayout(false);
-            _mainSplitContainer.Panel1.ResumeLayout(false);
-            _mainSplitContainer.Panel2.ResumeLayout(false);
-            ((ISupportInitialize)_mainSplitContainer).EndInit();
-            _mainSplitContainer.ResumeLayout(false);
-            ResumeLayout(false);
-
-            // ✅ 最后添加工具栏按钮
-            //AddToolbarButtons();
-        }
-
-
-        private void AddToolbarButtons()
-        {
-            // 设置工具栏样式
-            _toolStrip.BackColor = Color.FromArgb(45, 45, 48);
-            _toolStrip.ForeColor = Color.White;
-            //_toolStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
-
-            // 新建
-            var btnNew = new ToolStripButton("新建工作流", null, OnNewClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,  // 垂直工具栏按钮宽度
-                Height = 35,
-                ToolTipText = "新建工作流 (Ctrl+N)"
-            };
-
-            // 打开
-            var btnOpen = new ToolStripButton("打开工作流", null, OnOpenClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "打开工作流 (Ctrl+O)"
-            };
-
-            // 保存
-            var btnSave = new ToolStripButton("保存工作流", null, OnSaveClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "保存工作流 (Ctrl+S)"
-            };
-
-            //_toolStrip.Items.Add(btnNew);
-            _toolStrip.Items.Add(btnOpen);
-            _toolStrip.Items.Add(btnSave);
-            _toolStrip.Items.Add(new ToolStripSeparator());
-
-            // 验证
-            var btnValidate = new ToolStripButton("验证工作流", null, OnValidateClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "验证工作流"
-            };
-
-            // 自动布局
-            var btnAutoLayout = new ToolStripButton("自动布局", null, OnAutoLayoutClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "自动排列节点"
-            };
-
-            _toolStrip.Items.Add(btnValidate);
-            _toolStrip.Items.Add(btnAutoLayout);
-        }
 
         private void InitializeNodeEditor()
         {
@@ -371,6 +197,15 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 
             // 键盘快捷键
             _nodeEditor.KeyDown += OnEditorKeyDown;
+
+            // 记录右键点击位置（用于粘贴）
+            _nodeEditor.MouseDown += (s, e) =>
+            {
+                if (e.Button == MouseButtons.Right)
+                {
+                    //_lastRightClickPosition = _nodeEditor.PointToCanvas(e.Location);
+                }
+            };
         }
 
         #endregion
@@ -444,8 +279,34 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
                 OnSaveClick(sender, EventArgs.Empty);
                 e.Handled = true;
             }
-            // Ctrl+Z 撤销 (暂不实现)
-            // Ctrl+Y 重做 (暂不实现)
+            //  新增：复制
+            else if (e.Control && e.KeyCode == Keys.C)
+            {
+                OnCopyNode(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            //  新增：粘贴
+            else if (e.Control && e.KeyCode == Keys.V)
+            {
+                OnPasteNode(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            //  新增：缩放快捷键
+            else if (e.Control && e.KeyCode == Keys.Add)
+            {
+                OnZoomInClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Subtract)
+            {
+                OnZoomOutClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.D0)
+            {
+                OnZoomResetClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
         }
 
         #endregion
@@ -744,6 +605,476 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         }
 
         #endregion
+
+        #region 功能2: 增强的右键菜单
+
+        /// <summary>
+        /// 创建增强的右键菜单
+        /// </summary>
+        private ContextMenuStrip CreateEnhancedContextMenu()
+        {
+            var menu = new ContextMenuStrip
+            {
+                BackColor = Color.FromArgb(45, 45, 48),
+                ForeColor = Color.White
+            };
+
+            // 节点操作
+            var copyItem = new ToolStripMenuItem("复制节点 (Ctrl+C)", null, OnCopyNode)
+            {
+                ShortcutKeys = Keys.Control | Keys.C
+            };
+            var pasteItem = new ToolStripMenuItem("粘贴节点 (Ctrl+V)", null, OnPasteNode)
+            {
+                ShortcutKeys = Keys.Control | Keys.V
+            };
+            var deleteItem = new ToolStripMenuItem("删除节点 (Delete)", null, OnDeleteNode)
+            {
+                ShortcutKeys = Keys.Delete
+            };
+
+            menu.Items.Add(copyItem);
+            menu.Items.Add(pasteItem);
+            menu.Items.Add(new ToolStripSeparator());
+            menu.Items.Add(deleteItem);
+            menu.Items.Add(new ToolStripSeparator());
+
+            // 对齐工具
+            var alignMenu = new ToolStripMenuItem("对齐节点");
+            alignMenu.DropDownItems.Add("左对齐", null, (s, e) => AlignNodes(AlignmentType.Left));
+            alignMenu.DropDownItems.Add("右对齐", null, (s, e) => AlignNodes(AlignmentType.Right));
+            alignMenu.DropDownItems.Add("顶部对齐", null, (s, e) => AlignNodes(AlignmentType.Top));
+            alignMenu.DropDownItems.Add("底部对齐", null, (s, e) => AlignNodes(AlignmentType.Bottom));
+            alignMenu.DropDownItems.Add(new ToolStripSeparator());
+            alignMenu.DropDownItems.Add("水平居中", null, (s, e) => AlignNodes(AlignmentType.HorizontalCenter));
+            alignMenu.DropDownItems.Add("垂直居中", null, (s, e) => AlignNodes(AlignmentType.VerticalCenter));
+
+            menu.Items.Add(alignMenu);
+            menu.Items.Add(new ToolStripSeparator());
+
+            // 分布工具
+            var distributeMenu = new ToolStripMenuItem("分布节点");
+            distributeMenu.DropDownItems.Add("水平分布", null, (s, e) => DistributeNodes(true));
+            distributeMenu.DropDownItems.Add("垂直分布", null, (s, e) => DistributeNodes(false));
+
+            menu.Items.Add(distributeMenu);
+            menu.Items.Add(new ToolStripSeparator());
+
+            // 配置
+            var configItem = new ToolStripMenuItem("配置节点 (双击)", null, OnConfigNode);
+            menu.Items.Add(configItem);
+
+            // 右键菜单打开前检查
+            menu.Opening += (s, e) =>
+            {
+                var selectedNodes = _nodeEditor.GetSelectedNode();
+                bool hasSelection = selectedNodes != null && selectedNodes.Length > 0;
+                bool hasCopied = _copiedNode != null;
+
+                copyItem.Enabled = hasSelection;
+                pasteItem.Enabled = hasCopied;
+                deleteItem.Enabled = hasSelection;
+                alignMenu.Enabled = selectedNodes != null && selectedNodes.Length >= 2;
+                distributeMenu.Enabled = selectedNodes != null && selectedNodes.Length >= 3;
+                configItem.Enabled = _nodeEditor.ActiveNode != null;
+            };
+
+            return menu;
+        }
+
+        private void OnCopyNode(object sender, EventArgs e)
+        {
+            _copiedNode = _nodeEditor.ActiveNode;
+            if (_copiedNode != null)
+            {
+                MessageBox.Show("节点已复制到剪贴板", "提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
+
+        private void OnPasteNode(object sender, EventArgs e)
+        {
+            if (_copiedNode == null) return;
+
+            try
+            {
+                // 克隆节点
+                var newNode = CloneNode(_copiedNode);
+                if (newNode != null)
+                {
+                    // 偏移位置
+                    newNode.Left = _copiedNode.Left + 30;
+                    newNode.Top = _copiedNode.Top + 30;
+
+                    _nodeEditor.Nodes.Add(newNode);
+                    IsDirty = true;
+                    WorkflowChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"粘贴失败: {ex.Message}", "错误", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void OnDeleteNode(object sender, EventArgs e)
+        {
+            DeleteSelectedNodes();
+        }
+
+        private void OnConfigNode(object sender, EventArgs e)
+        {
+            if (_nodeEditor.ActiveNode is WorkflowNodeBase node)
+            {
+                var args = new NodeDoubleClickEventArgs(node);
+                NodeDoubleClick?.Invoke(this, args);
+
+                if (!args.Handled)
+                {
+                    node.OpenConfigDialog();
+                }
+            }
+        }
+
+        #endregion
+
+        #region 功能3: 节点对齐
+
+        private enum AlignmentType
+        {
+            Left, Right, Top, Bottom, HorizontalCenter, VerticalCenter
+        }
+
+        /// <summary>
+        /// 对齐选中的节点
+        /// </summary>
+        private void AlignNodes(AlignmentType alignType)
+        {
+            var selectedNodes = _nodeEditor.GetSelectedNode();
+            if (selectedNodes == null || selectedNodes.Length < 2) return;
+
+            switch (alignType)
+            {
+                case AlignmentType.Left:
+                    int minLeft = selectedNodes.Min(n => n.Left);
+                    foreach (var node in selectedNodes)
+                        node.Left = minLeft;
+                    break;
+
+                case AlignmentType.Right:
+                    int maxRight = selectedNodes.Max(n => n.Left + n.Width);
+                    foreach (var node in selectedNodes)
+                        node.Left = maxRight - node.Width;
+                    break;
+
+                case AlignmentType.Top:
+                    int minTop = selectedNodes.Min(n => n.Top);
+                    foreach (var node in selectedNodes)
+                        node.Top = minTop;
+                    break;
+
+                case AlignmentType.Bottom:
+                    int maxBottom = selectedNodes.Max(n => n.Top + n.Height);
+                    foreach (var node in selectedNodes)
+                        node.Top = maxBottom - node.Height;
+                    break;
+
+                case AlignmentType.HorizontalCenter:
+                    int avgLeft = (int)selectedNodes.Average(n => n.Left + n.Width / 2);
+                    foreach (var node in selectedNodes)
+                        node.Left = avgLeft - node.Width / 2;
+                    break;
+
+                case AlignmentType.VerticalCenter:
+                    int avgTop = (int)selectedNodes.Average(n => n.Top + n.Height / 2);
+                    foreach (var node in selectedNodes)
+                        node.Top = avgTop - node.Height / 2;
+                    break;
+            }
+
+            _nodeEditor.Invalidate();
+            IsDirty = true;
+        }
+
+        /// <summary>
+        /// 分布节点
+        /// </summary>
+        private void DistributeNodes(bool horizontal)
+        {
+            var selectedNodes = _nodeEditor.GetSelectedNode();
+            if (selectedNodes == null || selectedNodes.Length < 3) return;
+
+            var sortedNodes = horizontal
+                ? selectedNodes.OrderBy(n => n.Left).ToArray()
+                : selectedNodes.OrderBy(n => n.Top).ToArray();
+
+            if (horizontal)
+            {
+                int totalWidth = sortedNodes.Sum(n => n.Width);
+                int span = sortedNodes.Last().Left - sortedNodes.First().Left;
+                int gap = (span - totalWidth) / (sortedNodes.Length - 1);
+
+                int currentX = sortedNodes.First().Left;
+                foreach (var node in sortedNodes)
+                {
+                    node.Left = currentX;
+                    currentX += node.Width + gap;
+                }
+            }
+            else
+            {
+                int totalHeight = sortedNodes.Sum(n => n.Height);
+                int span = sortedNodes.Last().Top - sortedNodes.First().Top;
+                int gap = (span - totalHeight) / (sortedNodes.Length - 1);
+
+                int currentY = sortedNodes.First().Top;
+                foreach (var node in sortedNodes)
+                {
+                    node.Top = currentY;
+                    currentY += node.Height + gap;
+                }
+            }
+
+            _nodeEditor.Invalidate();
+            IsDirty = true;
+        }
+
+        #endregion
+
+        #region 功能4: 缩放控制
+
+        /// <summary>
+        /// 初始化缩放显示 - 添加到工具栏
+        /// </summary>
+        private void InitializeZoomControls()
+        {
+            // 在工具栏添加缩放控制
+            _toolStrip.Items.Add(new ToolStripSeparator());
+
+            // 缩放显示标签
+            var zoomLabelItem = new ToolStripLabel("缩放: 100%")
+            {
+                Name = "_zoomLabelItem",
+                AutoSize = false,
+                Width = 230,
+                Height = 25,
+                TextAlign = ContentAlignment.MiddleLeft,
+                ForeColor = Color.White
+            };
+            _toolStrip.Items.Add(zoomLabelItem);
+
+            // 放大按钮
+            var btnZoomIn = new ToolStripButton("🔍 放大", null, OnZoomInClick)
+            {
+                AutoSize = false,
+                Width = 230,
+                Height = 35,
+                ToolTipText = "放大 (Ctrl + 加号)"
+            };
+
+            // 缩小按钮
+            var btnZoomOut = new ToolStripButton("🔍 缩小", null, OnZoomOutClick)
+            {
+                AutoSize = false,
+                Width = 230,
+                Height = 35,
+                ToolTipText = "缩小 (Ctrl + 减号)"
+            };
+
+            // 重置按钮
+            var btnZoomReset = new ToolStripButton("🔍 重置", null, OnZoomResetClick)
+            {
+                AutoSize = false,
+                Width = 230,
+                Height = 35,
+                ToolTipText = "重置缩放 (Ctrl+0)"
+            };
+
+            _toolStrip.Items.Add(btnZoomIn);
+            _toolStrip.Items.Add(btnZoomOut);
+            _toolStrip.Items.Add(btnZoomReset);
+
+            // 监听缩放变化
+            //_nodeEditor.CanvasScaleChanged += (s, e) => UpdateZoomLabel();
+            _nodeEditor.CanvasScaled += (s, e) => UpdateZoomLabel();
+        }
+
+        private void UpdateZoomLabel()
+        {
+            if (_toolStrip.Items["_zoomLabelItem"] is ToolStripLabel zoomLabelItem)
+            {
+                int zoomPercent = (int)(_nodeEditor.CanvasScale * 100);
+                zoomLabelItem.Text = $"缩放: {zoomPercent}%";
+            }
+        }
+
+        #endregion
+
+        #region 功能5: 小地图/缩略图
+
+        /// <summary>
+        /// 初始化小地图
+        /// </summary>
+        private void InitializeMiniMap()
+        {
+            _miniMap = new PictureBox
+            {
+                Size = new Size(200, 150),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.FromArgb(25, 25, 25),
+                SizeMode = PictureBoxSizeMode.Zoom,
+                Anchor = AnchorStyles.Top | AnchorStyles.Right
+            };
+
+            // 定位到右上角
+            _miniMap.Location = new Point(
+                _nodeEditor.Width - _miniMap.Width - 10,
+                10
+            );
+
+            // 添加到节点编辑器
+            _nodeEditor.Controls.Add(_miniMap);
+            _miniMap.BringToFront();
+
+            // 鼠标点击小地图跳转
+            _miniMap.MouseClick += OnMiniMapClick;
+
+            // 定时更新小地图
+            //var miniMapTimer = new Timer { Interval = 1000 };
+            //miniMapTimer.Tick += (s, e) => UpdateMiniMap();
+            //miniMapTimer.Start();
+        }
+
+        //private void UpdateMiniMap()
+        //{
+        //    if (_nodeEditor.Nodes.Count == 0)
+        //    {
+        //        _miniMap.Image = null;
+        //        return;
+        //    }
+
+        //    try
+        //    {
+        //        // 计算所有节点的边界
+        //        int minX = _nodeEditor.Nodes.Min(n => n.Left);
+        //        int minY = _nodeEditor.Nodes.Min(n => n.Top);
+        //        int maxX = _nodeEditor.Nodes.Max(n => n.Left + n.Width);
+        //        int maxY = _nodeEditor.Nodes.Max(n => n.Top + n.Height);
+
+        //        int width = maxX - minX + 40;
+        //        int height = maxY - minY + 40;
+
+        //        if (width <= 0 || height <= 0) return;
+
+        //        // 创建缩略图
+        //        var bitmap = new Bitmap(_miniMap.Width, _miniMap.Height);
+        //        using (var g = Graphics.FromImage(bitmap))
+        //        {
+        //            g.Clear(_miniMap.BackColor);
+
+        //            float scaleX = (float)_miniMap.Width / width;
+        //            float scaleY = (float)_miniMap.Height / height;
+        //            float scale = Math.Min(scaleX, scaleY);
+
+        //            // 绘制节点
+        //            foreach (var node in _nodeEditor.Nodes)
+        //            {
+        //                int x = (int)((node.Left - minX + 20) * scale);
+        //                int y = (int)((node.Top - minY + 20) * scale);
+        //                int w = Math.Max(2, (int)(node.Width * scale));
+        //                int h = Math.Max(2, (int)(node.Height * scale));
+
+        //                var color = node == _nodeEditor.ActiveNode
+        //                    ? Color.Yellow
+        //                    : Color.FromArgb(100, 150, 200);
+
+        //                g.FillRectangle(new SolidBrush(color), x, y, w, h);
+        //                g.DrawRectangle(Pens.White, x, y, w, h);
+        //            }
+        //        }
+
+        //        _miniMap.Image?.Dispose();
+        //        _miniMap.Image = bitmap;
+        //    }
+        //    catch
+        //    {
+        //        // 忽略错误
+        //    }
+        //}
+
+        private void OnMiniMapClick(object sender, MouseEventArgs e)
+        {
+            // 根据点击位置调整视图
+            // 这里需要根据实际情况实现
+        }
+
+        #endregion
+
+        #region 功能6: 辅助方法
+
+        /// <summary>
+        /// 克隆节点
+        /// </summary>
+        private STNode CloneNode(STNode source)
+        {
+            if (source is WorkflowNodeBase workflowNode)
+            {
+                // 使用工厂创建相同类型的节点
+                var newNode = WorkflowNodeFactory.CreateNode(workflowNode.StepName);
+                if (newNode != null && workflowNode.StepParameter != null)
+                {
+                    // 深度复制参数 (需要参数类实现 ICloneable 或序列化)
+                    try
+                    {
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(workflowNode.StepParameter);
+                        var paramType = workflowNode.StepParameter.GetType();
+                        newNode.StepParameter = Newtonsoft.Json.JsonConvert.DeserializeObject(json, paramType);
+                    }
+                    catch
+                    {
+                        // 复制失败，使用默认参数
+                    }
+                }
+                return newNode;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 增强的键盘快捷键处理
+        /// </summary>
+        private void OnEditorKeyDownEnhanced(object sender, KeyEventArgs e)
+        {
+            // 复制
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                OnCopyNode(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            // 粘贴
+            else if (e.Control && e.KeyCode == Keys.V)
+            {
+                OnPasteNode(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            // 缩放
+            else if (e.Control && e.KeyCode == Keys.Add)
+            {
+                OnZoomInClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.Subtract)
+            {
+                OnZoomOutClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+            else if (e.Control && e.KeyCode == Keys.D0)
+            {
+                OnZoomResetClick(sender, EventArgs.Empty);
+                e.Handled = true;
+            }
+        }
+
+        #endregion
     }
 
     #region 事件参数类
@@ -751,26 +1082,42 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
     /// <summary>
     /// 节点选中事件参数
     /// </summary>
-    public class NodeSelectedEventArgs(WorkflowNodeBase node) : EventArgs
+    public class NodeSelectedEventArgs : EventArgs
     {
-        public WorkflowNodeBase Node { get; } = node;
+        public WorkflowNodeBase Node { get; }
+
+        public NodeSelectedEventArgs(WorkflowNodeBase node)
+        {
+            Node = node;
+        }
     }
 
     /// <summary>
     /// 节点双击事件参数
     /// </summary>
-    public class NodeDoubleClickEventArgs(WorkflowNodeBase node) : EventArgs
+    public class NodeDoubleClickEventArgs : EventArgs
     {
-        public WorkflowNodeBase Node { get; } = node;
-        public bool Handled { get; set; } = false;
+        public WorkflowNodeBase Node { get; }
+        public bool Handled { get; set; }
+
+        public NodeDoubleClickEventArgs(WorkflowNodeBase node)
+        {
+            Node = node;
+            Handled = false;
+        }
     }
 
     /// <summary>
     /// 验证结果事件参数
     /// </summary>
-    public class ValidationResultEventArgs(ValidationResult result) : EventArgs
+    public class ValidationResultEventArgs : EventArgs
     {
-        public ValidationResult Result { get; } = result;
+        public ValidationResult Result { get; }
+
+        public ValidationResultEventArgs(ValidationResult result)
+        {
+            Result = result;
+        }
     }
 
     #endregion

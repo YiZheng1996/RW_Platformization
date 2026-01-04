@@ -90,8 +90,10 @@
             Icon = (Icon)resources.GetObject("$this.Icon");
             MinimumSize = new Size(1000, 600);
             Name = "WorkflowDesignerForm";
+            ShowIcon = false;
             StartPosition = FormStartPosition.CenterParent;
             Text = "工作流设计器";
+            WindowState = FormWindowState.Maximized;
             _statusStrip.ResumeLayout(false);
             _statusStrip.PerformLayout();
             ResumeLayout(false);
