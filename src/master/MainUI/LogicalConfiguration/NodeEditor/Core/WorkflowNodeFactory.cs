@@ -1,10 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using System.Reflection;
-using ST.Library.UI.NodeEditor;
 
-namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
+namespace MainUI.LogicalConfiguration.NodeEditor.Core
 {
     /// <summary>
     /// 节点工厂 - 负责创建和管理工作流节点
@@ -123,7 +120,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"扫描节点类型失败: {ex.Message}");
+                Debug.WriteLine($"扫描节点类型失败: {ex.Message}");
             }
         }
 
@@ -165,7 +162,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                 }
                 catch (Exception ex)
                 {
-                    System.Diagnostics.Debug.WriteLine($"创建节点失败 [{stepName}]: {ex.Message}");
+                    Debug.WriteLine($"创建节点失败 [{stepName}]: {ex.Message}");
                 }
             }
 
@@ -315,8 +312,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = $"❓ {_stepName}";
-            this.TitleColor = System.Drawing.Color.FromArgb(200, 128, 128, 128);
+            Title = $"❓ {_stepName}";
+            TitleColor = Color.FromArgb(200, 128, 128, 128);
         }
     }
 

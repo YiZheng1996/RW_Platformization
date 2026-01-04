@@ -1,12 +1,5 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using ST.Library.UI.NodeEditor;
 using MainUI.LogicalConfiguration.NodeEditor.Nodes;
+using ST.Library.UI.NodeEditor;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Core
 {

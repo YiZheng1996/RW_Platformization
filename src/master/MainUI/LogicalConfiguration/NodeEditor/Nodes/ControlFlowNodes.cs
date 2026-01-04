@@ -1,8 +1,5 @@
-using System;
-using System.Drawing;
-using System.Collections.Generic;
-using ST.Library.UI.NodeEditor;
 using MainUI.LogicalConfiguration.Parameter;
+using ST.Library.UI.NodeEditor;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 {
@@ -10,7 +7,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// 条件判断节点 - 根据条件表达式判断执行分支
     /// 有两个输出端口：True 和 False
     /// </summary>
-    [STNode("逻辑控制/条件判断", "工作流设计器", "", "", "根据条件表达式判断执行分支")]
+    [STNode("逻辑控制", "工作流设计器", "条件判断", "", "根据条件表达式判断执行分支")]
     public class ConditionNode : WorkflowNodeBase
     {
         #region 属性
@@ -67,7 +64,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(180, 80);
-            this.Title = "❓ 条件判断";
+            this.Title = "条件判断";
         }
 
         protected override Color GetTitleColor()
@@ -77,18 +74,6 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            //// 输入在顶部
-            //InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            //SetPortAlignment(InputExecution, PortAlignment.Top);
-
-            //// True 分支在右侧
-            //OutputTrue = this.OutputOptions.Add("✓", ExecutionFlowType, false);
-            //SetPortAlignment(OutputTrue, PortAlignment.Right);
-
-            //// False 分支在左侧
-            //OutputFalse = this.OutputOptions.Add("✗", ExecutionFlowType, false);
-            //SetPortAlignment(OutputFalse, PortAlignment.Left);
-
             // 执行输入
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
 
@@ -209,7 +194,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// 循环节点 - 支持循环执行一组步骤
     /// 有两个输出：循环体 和 完成后
     /// </summary>
-    [STNode("逻辑控制/循环", "工作流设计器", "", "", "循环执行一组步骤")]
+    [STNode("逻辑控制", "工作流设计器", "循环工具", "", "循环执行一组步骤")]
     public class LoopNode : WorkflowNodeBase
     {
         #region 属性
@@ -278,7 +263,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(180, 100);
-            this.Title = "🔄 循环";
+            this.Title = "循环";
         }
 
         protected override Color GetTitleColor()
@@ -406,7 +391,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 等待稳定节点 - 等待变量值稳定
     /// </summary>
-    [STNode("逻辑控制/等待稳定", "工作流设计器", "", "", "等待变量值稳定后继续执行")]
+    [STNode("逻辑控制", "工作流设计器", "等待稳定", "", "等待变量值稳定后继续执行")]
     public class WaitForStableNode : WorkflowNodeBase
     {
         #region 属性
@@ -461,7 +446,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(180, 80);
-            this.Title = "⏳ 等待稳定";
+            this.Title = "等待稳定";
         }
 
         protected override Color GetTitleColor()

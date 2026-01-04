@@ -9,7 +9,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 延时等待节点 - 暂停执行指定时间
     /// </summary>
-    [STNode("逻辑控制/延时等待", "工作流设计器", "", "", "暂停执行指定时间")]
+    //[STNode("逻辑控制/延时等待", "工作流设计器", "", "", "暂停执行指定时间")]
+    [STNode("逻辑控制", "工作流设计器", "延时等待", "", "暂停执行指定时间")]
     public class DelayNode : WorkflowNodeBase
     {
         public override string StepName => "DelayWait";
@@ -49,18 +50,16 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "⏱️ 延时等待";
+            this.Title = "延时等待";
         }
 
         protected override void CreateDefaultPorts()
         {
             // 输入在顶部
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            SetPortAlignment(InputExecution, PortAlignment.Top);
 
             // 输出在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
-            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         protected override Color GetTitleColor()
@@ -98,7 +97,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 变量赋值节点 - 为变量设置值
     /// </summary>
-    [STNode("数据操作/变量赋值", "工作流设计器", "", "", "为变量设置值")]
+    //[STNode("数据操作/变量赋值", "工作流设计器", "", "", "为变量设置值")]
+    [STNode("数据操作", "工作流设计器", "变量赋值", "", "为变量设置值")]
     public class VariableAssignNode : WorkflowNodeBase
     {
         public override string StepName => "VariableAssign";
@@ -128,6 +128,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                 string target = Parameter.TargetVarName ?? "?";
                 return $"@{target} = ...";
             }
+        }
+
+        protected override void CreateDefaultPorts()
+        {
+            // 执行输入 - 在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+            //SetPortAlignment(InputExecution, PortAlignment.Top);
+
+            // 执行输出 - 在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+            //SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         protected override void OnCreate()
@@ -171,7 +182,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 读取PLC节点 - 从PLC读取数据到变量
     /// </summary>
-    [STNode("通信操作/读取PLC", "工作流设计器", "", "", "从PLC读取数据到变量")]
+    //[STNode("通信操作/读取PLC", "工作流设计器", "", "", "从PLC读取数据到变量")]
+    [STNode("通信操作", "工作流设计器", "读取PLC", "", "从PLC读取数据到变量")]
     public class ReadPLCNode : WorkflowNodeBase
     {
         public override string StepName => "PLCRead";
@@ -202,10 +214,19 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             }
         }
 
+        protected override void CreateDefaultPorts()
+        {
+            // 执行输入 - 在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+
+            // 执行输出 - 在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+        }
+
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "📥 读取PLC";
+            this.Title = "读取PLC";
         }
 
         protected override Color GetTitleColor()
@@ -246,7 +267,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 写入PLC节点 - 向PLC写入数据
     /// </summary>
-    [STNode("通信操作/写入PLC", "工作流设计器", "", "", "向PLC写入数据")]
+    //[STNode("通信操作/写入PLC", "工作流设计器", "", "", "向PLC写入数据")]
+    [STNode("通信操作", "工作流设计器", "写入PLC", "", "向PLC写入数据")]
     public class WritePLCNode : WorkflowNodeBase
     {
         public override string StepName => "PLCWrite";
@@ -276,11 +298,19 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                 return $"写入 {Parameter.Items.Count} 个点位";
             }
         }
+        protected override void CreateDefaultPorts()
+        {
+            // 执行输入 - 在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+
+            // 执行输出 - 在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+        }
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "📤 写入PLC";
+            this.Title = "写入PLC";
         }
 
         protected override Color GetTitleColor()
@@ -321,7 +351,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 消息通知节点 - 发送消息提示
     /// </summary>
-    [STNode("数据操作/消息通知", "工作流设计器", "", "", "发送消息通知")]
+    //[STNode("数据操作/消息通知", "工作流设计器", "", "", "发送消息通知")]
+    [STNode("数据操作", "工作流设计器", "消息通知", "", "发送消息通知")]
     public class MessageNotifyNode : WorkflowNodeBase
     {
         public override string StepName => "MessageNotify";
@@ -353,11 +384,19 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                 return $"[{MessageType}] {preview}";
             }
         }
+        protected override void CreateDefaultPorts()
+        {
+            // 执行输入 - 在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+
+            // 执行输出 - 在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+        }
 
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "💬 消息通知";
+            this.Title = "消息通知";
         }
 
         protected override Color GetTitleColor()
@@ -384,9 +423,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             {
                 Message = System.Text.Encoding.UTF8.GetString(dic["Message"]);
             }
-            if (dic.ContainsKey("MessageType"))
+            if (dic.TryGetValue("MessageType", out byte[] value))
             {
-                MessageType = (MessageType)BitConverter.ToInt32(dic["MessageType"], 0);
+                MessageType = (MessageType)BitConverter.ToInt32(value, 0);
             }
         }
     }
@@ -397,7 +436,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 实时监控节点 - 显示实时监控窗口
     /// </summary>
-    [STNode("逻辑控制/实时监控", "工作流设计器", "", "", "显示实时监控窗口")]
+    //[STNode("逻辑控制/实时监控", "工作流设计器", "", "", "显示实时监控窗口")]
+    [STNode("逻辑控制", "工作流设计器", "实时监控", "", "显示实时监控窗口")]
     public class RealtimeMonitorNode : WorkflowNodeBase
     {
         public override string StepName => "MonitorTool";
@@ -428,10 +468,19 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             }
         }
 
+        protected override void CreateDefaultPorts()
+        {
+            // 执行输入 - 在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+
+            // 执行输出 - 在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+        }
+
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "📺 实时监控";
+            this.Title = "实时监控";
         }
 
         protected override Color GetTitleColor()

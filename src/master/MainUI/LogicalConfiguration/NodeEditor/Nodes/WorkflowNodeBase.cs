@@ -244,11 +244,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         {
             // 执行输入 - 在顶部
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            SetPortAlignment(InputExecution, PortAlignment.Top);
+            //SetPortAlignment(InputExecution, PortAlignment.Top);
 
             // 执行输出 - 在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
-            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
+            //SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         /// <summary>

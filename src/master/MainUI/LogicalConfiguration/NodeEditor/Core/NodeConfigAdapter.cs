@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Windows.Forms;
 using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using MainUI.LogicalConfiguration.Parameter;
 
@@ -25,10 +22,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
                 {
                     lock (_lock)
                     {
-                        if (_instance == null)
-                        {
-                            _instance = new NodeConfigAdapter();
-                        }
+                        _instance ??= new NodeConfigAdapter();
                     }
                 }
                 return _instance;
@@ -784,11 +778,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
                 Size = new System.Drawing.Size(75, 28)
             };
 
-            this.Controls.AddRange(new Control[] { 
-                lblCount, txtLoopCount, 
+            this.Controls.AddRange(new Control[] {
+                lblCount, txtLoopCount,
                 chkEnableCounter, lblCounterVar, txtCounterVar,
                 chkEnableEarlyExit, lblExit, txtExitCondition,
-                btnOk, btnCancel 
+                btnOk, btnCancel
             });
             this.AcceptButton = btnOk;
             this.CancelButton = btnCancel;
@@ -878,10 +872,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
 
             btnCancel = new Button { Text = "取消", DialogResult = DialogResult.Cancel, Location = new System.Drawing.Point(285, y), Size = new System.Drawing.Size(75, 28) };
 
-            this.Controls.AddRange(new Control[] { 
-                lblVar, txtVariable, lblThreshold, numThreshold, 
+            this.Controls.AddRange(new Control[] {
+                lblVar, txtVariable, lblThreshold, numThreshold,
                 lblInterval, numInterval, lblCount, numStableCount,
-                lblTimeout, numTimeout, btnOk, btnCancel 
+                lblTimeout, numTimeout, btnOk, btnCancel
             });
             this.AcceptButton = btnOk;
             this.CancelButton = btnCancel;

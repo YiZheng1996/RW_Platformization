@@ -161,8 +161,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 
             foreach (var category in nodesByCategory)
             {
+                Debug.WriteLine($"Category: {category.Key}");
                 foreach (var nodeInfo in category.Value)
                 {
+                    Debug.WriteLine($"  Node: {nodeInfo.DisplayName}");
                     try
                     {
                         // 加载节点类型的程序集

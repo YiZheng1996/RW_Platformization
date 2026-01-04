@@ -7,12 +7,12 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 开始节点 - 工作流的起点
     /// </summary>
-    [STNode("工作流/开始", "工作流设计器", "", "", "工作流的起始点")]
+    [STNode("工作流", "工作流设计器", "开始流程", "", "工作流的起始点")]
     public class StartNode : WorkflowNodeBase
     {
         public override string StepName => "Start";
 
-        public override string DisplayName => "开始";
+        public override string DisplayName => "开始流程";
 
         public override string CategoryPath => "工作流";
 
@@ -25,7 +25,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(100, 50);
-            this.Title = "🚀 开始";
+            this.Title = "开始";
         }
 
         protected override Color GetTitleColor()
@@ -37,7 +37,6 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         {
             // 开始节点只有输出端口，放在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
-            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         protected override void OnDrawBody(DrawingTools dt)
@@ -66,11 +65,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 结束节点 - 工作流的终点
     /// </summary>
-    [STNode("工作流/结束", "工作流设计器", "", "", "工作流的结束点")]
+    [STNode("工作流", "工作流设计器", "结束流程", "", "工作流的结束点")]
     public class EndNode : WorkflowNodeBase
     {
         public override string StepName => "End";
-        public override string DisplayName => "结束";
+        public override string DisplayName => "结束流程";
         public override string CategoryPath => "工作流";
         public override string Description => "工作流的结束点，可以有多个结束节点";
         public override string ConfigSummary => "";
@@ -101,9 +100,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            // 结束节点只有输入端口，放在顶部
+            // 结束节点只有输入端口
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            SetPortAlignment(InputExecution, PortAlignment.Top);
         }
 
         private void UpdateTitle()
@@ -195,7 +193,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 注释节点 - 用于添加说明文字
     /// </summary>
-    [STNode("工作流/注释", "工作流设计器", "", "", "添加注释说明")]
+    [STNode("工作流", "工作流设计器", "注释", "", "添加注释说明")]
     public class CommentNode : WorkflowNodeBase
     {
         public override string StepName => "Comment";
