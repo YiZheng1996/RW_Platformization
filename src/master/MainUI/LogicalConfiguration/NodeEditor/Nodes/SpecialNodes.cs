@@ -1,5 +1,3 @@
-using System;
-using System.Drawing;
 using ST.Library.UI.NodeEditor;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
@@ -13,9 +11,13 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     public class StartNode : WorkflowNodeBase
     {
         public override string StepName => "Start";
+
         public override string DisplayName => "开始";
+
         public override string CategoryPath => "工作流";
+
         public override string Description => "工作流的起始点，每个工作流必须有且只有一个开始节点";
+
         public override string ConfigSummary => "";
 
         protected override void OnCreate()
@@ -45,17 +47,15 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
             // 绘制圆形背景
             int padding = 5;
-            Rectangle rect = new Rectangle(
+            Rectangle rect = new(
                 this.Left + padding,
                 this.Top + this.TitleHeight + padding,
                 this.Width - padding * 2,
                 this.Height - this.TitleHeight - padding * 2
             );
 
-            using (var brush = new SolidBrush(Color.FromArgb(50, 40, 167, 69)))
-            {
-                g.FillEllipse(brush, rect);
-            }
+            using var brush = new SolidBrush(Color.FromArgb(50, 40, 167, 69));
+            g.FillEllipse(brush, rect);
         }
     }
 
@@ -110,10 +110,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         {
             this.Title = Status switch
             {
-                EndStatus.Success => "✅ 完成",
-                EndStatus.Failure => "❌ 失败",
-                EndStatus.Abort => "⚠️ 中止",
-                _ => "🏁 结束"
+                EndStatus.Success => "完成",
+                EndStatus.Failure => "失败",
+                EndStatus.Abort => "中止",
+                _ => "结束"
             };
             this.TitleColor = GetTitleColor();
         }
@@ -214,7 +214,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(200, 80);
-            this.Title = "📝 注释";
+            this.Title = "注释";
         }
 
         protected override Color GetTitleColor()
@@ -233,7 +233,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
             // 绘制注释文本
             int padding = 8;
-            Rectangle textRect = new Rectangle(
+            Rectangle textRect = new(
                 this.Left + padding,
                 this.Top + this.TitleHeight + padding,
                 this.Width - padding * 2,
@@ -242,78 +242,74 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
             string displayText = string.IsNullOrEmpty(CommentText) ? "双击编辑注释..." : CommentText;
 
-            using (var font = new Font("微软雅黑", 9f))
-            using (var brush = new SolidBrush(Color.FromArgb(200, 200, 200)))
-            using (var format = new StringFormat
+            using var font = new Font("微软雅黑", 9f);
+            using var brush = new SolidBrush(Color.FromArgb(200, 200, 200));
+            using var format = new StringFormat
             {
                 Alignment = StringAlignment.Near,
                 LineAlignment = StringAlignment.Near,
                 Trimming = StringTrimming.EllipsisWord
-            })
-            {
-                g.DrawString(displayText, font, brush, textRect, format);
-            }
+            };
+            g.DrawString(displayText, font, brush, textRect, format);
         }
 
-        protected override void OnSaveNodeData(System.Collections.Generic.Dictionary<string, byte[]> dic)
+        protected override void OnSaveNodeData(Dictionary<string, byte[]> dic)
         {
             dic["CommentText"] = System.Text.Encoding.UTF8.GetBytes(CommentText ?? "");
         }
 
-        protected override void OnLoadNodeData(System.Collections.Generic.Dictionary<string, byte[]> dic)
+        protected override void OnLoadNodeData(Dictionary<string, byte[]> dic)
         {
-            if (dic.ContainsKey("CommentText"))
+            if (dic.TryGetValue("CommentText", out byte[] value))
             {
-                CommentText = System.Text.Encoding.UTF8.GetString(dic["CommentText"]);
+                CommentText = System.Text.Encoding.UTF8.GetString(value);
             }
         }
 
         public override void OpenConfigDialog()
         {
             // 简单的输入对话框
-            using (var form = new System.Windows.Forms.Form())
+            using var form = new System.Windows.Forms.Form();
+            form.Text = "编辑注释";
+            form.Size = new Size(400, 250);
+            form.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            form.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            form.MaximizeBox = false;
+            form.MinimizeBox = false;
+
+            var textBox = new System.Windows.Forms.TextBox
             {
-                form.Text = "编辑注释";
-                form.Size = new Size(400, 250);
-                form.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-                form.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-                form.MaximizeBox = false;
-                form.MinimizeBox = false;
+                Multiline = true,
+                Text = CommentText,
+                Location = new Point(10, 10),
+                Size = new Size(365, 150),
+                ScrollBars = ScrollBars.Vertical
+            };
 
-                var textBox = new System.Windows.Forms.TextBox
-                {
-                    Multiline = true,
-                    Text = CommentText,
-                    Location = new Point(10, 10),
-                    Size = new Size(365, 150),
-                    ScrollBars = System.Windows.Forms.ScrollBars.Vertical
-                };
+            var btnOk = new Button
+            {
+                Text = "确定",
+                DialogResult = DialogResult.OK,
+                Location = new Point(210, 170),
+                Size = new Size(80, 30)
+            };
 
-                var btnOk = new System.Windows.Forms.Button
-                {
-                    Text = "确定",
-                    DialogResult = System.Windows.Forms.DialogResult.OK,
-                    Location = new Point(210, 170),
-                    Size = new Size(80, 30)
-                };
+            var btnCancel = new Button
+            {
+                Text = "取消",
+                DialogResult = DialogResult.Cancel,
+                Location = new Point(295, 170),
+                Size = new Size(80, 30)
+            };
 
-                var btnCancel = new System.Windows.Forms.Button
-                {
-                    Text = "取消",
-                    DialogResult = System.Windows.Forms.DialogResult.Cancel,
-                    Location = new Point(295, 170),
-                    Size = new Size(80, 30)
-                };
+            form.Controls.AddRange([textBox, btnOk, btnCancel]);
+            form.AcceptButton = btnOk;
+            form.CancelButton = btnCancel;
 
-                form.Controls.AddRange(new System.Windows.Forms.Control[] { textBox, btnOk, btnCancel });
-                form.AcceptButton = btnOk;
-                form.CancelButton = btnCancel;
-
-                if (form.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-                {
-                    CommentText = textBox.Text;
-                    this.Invalidate();
-                }
+            if (form.ShowDialog() == DialogResult.OK)
+            {
+                CommentText = textBox.Text;
+                this.Invalidate();
             }
         }
     }

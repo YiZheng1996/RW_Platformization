@@ -29,6 +29,8 @@
 
 using MainUI.LogicalConfiguration.NodeEditor.Controls;
 using MainUI.LogicalConfiguration.NodeEditor.Forms;
+using MainUI.LogicalConfiguration.Parameter;
+using MainUI.Procedure.DSL.LogicalConfiguration.Forms;
 
 namespace MainUI.LogicalConfiguration.NodeEditor
 {
@@ -192,8 +194,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor
                 {
                     case "DelayWait":
                         // 使用现有的延时配置窗体
-                        // configForm = new Form_DelayTime();
-                        // configForm.Parameter = (Parameter_DelayTime)e.Node.StepParameter;
+                        configForm = new Form_DelayTime
+                        {
+                            Parameter = (Parameter_DelayTime)e.Node.StepParameter
+                        };
                         break;
 
                     case "ConditionJudge":

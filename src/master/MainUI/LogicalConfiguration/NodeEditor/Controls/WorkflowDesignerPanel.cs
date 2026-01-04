@@ -1,12 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
-using ST.Library.UI.NodeEditor;
-using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using MainUI.LogicalConfiguration.NodeEditor.Core;
+using MainUI.LogicalConfiguration.NodeEditor.Nodes;
+using ST.Library.UI.NodeEditor;
+using System.ComponentModel;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 {
@@ -137,103 +132,82 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         #region 初始化
         private void InitializeComponent()
         {
-            // 创建所有控件
             _leftPanel = new Panel();
-            _toolbarPanel = new Panel();
-            _toolStrip = new ToolStrip();
             _nodeTreeView = new STNodeTreeView();
             _mainSplitContainer = new SplitContainer();
             _nodeEditor = new STNodeEditor();
             _propertyGrid = new STNodePropertyGrid();
-
-            _toolbarPanel.SuspendLayout();
+            _leftPanel.SuspendLayout();
             ((ISupportInitialize)_mainSplitContainer).BeginInit();
             _mainSplitContainer.Panel1.SuspendLayout();
             _mainSplitContainer.Panel2.SuspendLayout();
             _mainSplitContainer.SuspendLayout();
             SuspendLayout();
-
-            // ========================================
-            // 左侧面板（包含工具栏和节点树）
-            // ========================================
-            _leftPanel.Dock = DockStyle.Left;
-            _leftPanel.Width = 250;
-            _leftPanel.Name = "_leftPanel";
+            // 
+            // _leftPanel
+            // 
             _leftPanel.BackColor = Color.FromArgb(35, 35, 35);
+            _leftPanel.Controls.Add(_nodeTreeView);
+            _leftPanel.Dock = DockStyle.Left;
+            _leftPanel.Location = new Point(0, 0);
+            _leftPanel.Name = "_leftPanel";
+            _leftPanel.Size = new Size(250, 700);
             _leftPanel.TabIndex = 0;
-            _leftPanel.Controls.Add(_nodeTreeView);      // 先添加节点树（填充）
-            _leftPanel.Controls.Add(_toolbarPanel);      // 后添加工具栏（顶部）
-
-            // ========================================
-            // 工具栏面板
-            // ========================================
-            _toolbarPanel.Dock = DockStyle.Top;
-            _toolbarPanel.Height = 300;  // ✅ 增加高度以显示所有按钮
-            _toolbarPanel.Name = "_toolbarPanel";
-            _toolbarPanel.BackColor = Color.FromArgb(45, 45, 48);
-            _toolbarPanel.Padding = new Padding(5);
-            _toolbarPanel.TabIndex = 1;
-            _toolbarPanel.Controls.Add(_toolStrip);
-
-            // ========================================
-            // 工具栏（垂直布局）
-            // ========================================
-            _toolStrip.Dock = DockStyle.Fill;
-            _toolStrip.LayoutStyle = ToolStripLayoutStyle.VerticalStackWithOverflow;  // ✅ 垂直排列
-            _toolStrip.GripStyle = ToolStripGripStyle.Hidden;
-            _toolStrip.BackColor = Color.FromArgb(45, 45, 48);
-            _toolStrip.ForeColor = Color.White;
-            _toolStrip.Name = "_toolStrip";
-            _toolStrip.TabIndex = 0;
-
-            // ========================================
-            // 节点树视图
-            // ========================================
+            // 
+            // _nodeTreeView
+            // 
             _nodeTreeView.AllowDrop = true;
             _nodeTreeView.BackColor = Color.FromArgb(35, 35, 35);
-            _nodeTreeView.Dock = DockStyle.Fill;  // 填充剩余空间
+            _nodeTreeView.Dock = DockStyle.Fill;
             _nodeTreeView.FolderCountColor = Color.FromArgb(40, 255, 255, 255);
             _nodeTreeView.ForeColor = Color.FromArgb(220, 220, 220);
             _nodeTreeView.ItemBackColor = Color.FromArgb(45, 45, 45);
             _nodeTreeView.ItemHoverColor = Color.FromArgb(50, 125, 125, 125);
+            _nodeTreeView.Location = new Point(0, 0);
             _nodeTreeView.MinimumSize = new Size(100, 60);
             _nodeTreeView.Name = "_nodeTreeView";
             _nodeTreeView.ShowFolderCount = true;
+            _nodeTreeView.Size = new Size(250, 700);
             _nodeTreeView.TabIndex = 0;
             _nodeTreeView.TextBoxColor = Color.FromArgb(30, 30, 30);
             _nodeTreeView.TitleColor = Color.FromArgb(60, 60, 60);
-
-            // ========================================
-            // 主分割容器（编辑器 | 属性面板）
-            // ========================================
+            // 
+            // _mainSplitContainer
+            // 
             _mainSplitContainer.Dock = DockStyle.Fill;
+            _mainSplitContainer.Location = new Point(250, 0);
             _mainSplitContainer.Name = "_mainSplitContainer";
-            _mainSplitContainer.Orientation = Orientation.Vertical;  // ✅ 垂直分割（左右）
-            _mainSplitContainer.SplitterDistance = 700;
+            // 
+            // _mainSplitContainer.Panel1
+            // 
+            _mainSplitContainer.Panel1.Controls.Add(_nodeEditor);
+            // 
+            // _mainSplitContainer.Panel2
+            // 
+            _mainSplitContainer.Panel2.Controls.Add(_propertyGrid);
+            _mainSplitContainer.Size = new Size(950, 700);
+            _mainSplitContainer.SplitterDistance = 766;
             _mainSplitContainer.SplitterWidth = 5;
             _mainSplitContainer.TabIndex = 0;
-            _mainSplitContainer.Panel1.Controls.Add(_nodeEditor);
-            _mainSplitContainer.Panel2.Controls.Add(_propertyGrid);
-
-            // ========================================
-            // 节点编辑器（中间画板）
-            // ========================================
+            // 
+            // _nodeEditor
+            // 
             _nodeEditor.AllowDrop = true;
             _nodeEditor.BackColor = Color.FromArgb(34, 34, 34);
             _nodeEditor.Curvature = 0.3F;
             _nodeEditor.Dock = DockStyle.Fill;
             _nodeEditor.GridColor = Color.FromArgb(60, 60, 60);
+            _nodeEditor.Location = new Point(0, 0);
             _nodeEditor.LocationBackColor = Color.FromArgb(120, 0, 0, 0);
             _nodeEditor.MarkBackColor = Color.FromArgb(180, 0, 0, 0);
             _nodeEditor.MarkForeColor = Color.FromArgb(180, 0, 0, 0);
             _nodeEditor.MinimumSize = new Size(100, 100);
             _nodeEditor.Name = "_nodeEditor";
-            _nodeEditor.ShowGrid = true;
+            _nodeEditor.Size = new Size(766, 700);
             _nodeEditor.TabIndex = 0;
-
-            // ========================================
-            // 属性面板（右侧）
-            // ========================================
+            // 
+            // _propertyGrid
+            // 
             _propertyGrid.BackColor = Color.FromArgb(35, 35, 35);
             _propertyGrid.DescriptionColor = Color.FromArgb(200, 184, 134, 11);
             _propertyGrid.Dock = DockStyle.Fill;
@@ -241,22 +215,21 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _propertyGrid.ForeColor = Color.White;
             _propertyGrid.ItemHoverColor = Color.FromArgb(50, 125, 125, 125);
             _propertyGrid.ItemValueBackColor = Color.FromArgb(80, 80, 80);
+            _propertyGrid.Location = new Point(0, 0);
             _propertyGrid.MinimumSize = new Size(120, 50);
             _propertyGrid.Name = "_propertyGrid";
             _propertyGrid.ShowTitle = true;
+            _propertyGrid.Size = new Size(179, 700);
             _propertyGrid.TabIndex = 0;
             _propertyGrid.TitleColor = Color.FromArgb(127, 0, 0, 0);
-
-            // ========================================
-            // WorkflowDesignerPanel 本身
-            // ========================================
-            this.Controls.Add(_mainSplitContainer);  // 先添加主容器
-            this.Controls.Add(_leftPanel);            // 后添加左侧面板
-            this.Name = "WorkflowDesignerPanel";
-            this.Size = new Size(1200, 700);
-
-            _toolbarPanel.ResumeLayout(false);
-            _toolbarPanel.PerformLayout();
+            // 
+            // WorkflowDesignerPanel
+            // 
+            Controls.Add(_mainSplitContainer);
+            Controls.Add(_leftPanel);
+            Name = "WorkflowDesignerPanel";
+            Size = new Size(1200, 700);
+            _leftPanel.ResumeLayout(false);
             _mainSplitContainer.Panel1.ResumeLayout(false);
             _mainSplitContainer.Panel2.ResumeLayout(false);
             ((ISupportInitialize)_mainSplitContainer).EndInit();
@@ -264,7 +237,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             ResumeLayout(false);
 
             // ✅ 最后添加工具栏按钮
-            AddToolbarButtons();
+            //AddToolbarButtons();
         }
 
 
@@ -311,7 +284,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
                 ToolTipText = "保存工作流 (Ctrl+S)"
             };
 
-            _toolStrip.Items.Add(btnNew);
+            //_toolStrip.Items.Add(btnNew);
             _toolStrip.Items.Add(btnOpen);
             _toolStrip.Items.Add(btnSave);
             _toolStrip.Items.Add(new ToolStripSeparator());
@@ -778,42 +751,26 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
     /// <summary>
     /// 节点选中事件参数
     /// </summary>
-    public class NodeSelectedEventArgs : EventArgs
+    public class NodeSelectedEventArgs(WorkflowNodeBase node) : EventArgs
     {
-        public WorkflowNodeBase Node { get; }
-
-        public NodeSelectedEventArgs(WorkflowNodeBase node)
-        {
-            Node = node;
-        }
+        public WorkflowNodeBase Node { get; } = node;
     }
 
     /// <summary>
     /// 节点双击事件参数
     /// </summary>
-    public class NodeDoubleClickEventArgs : EventArgs
+    public class NodeDoubleClickEventArgs(WorkflowNodeBase node) : EventArgs
     {
-        public WorkflowNodeBase Node { get; }
-        public bool Handled { get; set; }
-
-        public NodeDoubleClickEventArgs(WorkflowNodeBase node)
-        {
-            Node = node;
-            Handled = false;
-        }
+        public WorkflowNodeBase Node { get; } = node;
+        public bool Handled { get; set; } = false;
     }
 
     /// <summary>
     /// 验证结果事件参数
     /// </summary>
-    public class ValidationResultEventArgs : EventArgs
+    public class ValidationResultEventArgs(ValidationResult result) : EventArgs
     {
-        public ValidationResult Result { get; }
-
-        public ValidationResultEventArgs(ValidationResult result)
-        {
-            Result = result;
-        }
+        public ValidationResult Result { get; } = result;
     }
 
     #endregion

@@ -52,16 +52,16 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             this.Title = "⏱️ 延时等待";
         }
 
-        //protected override void CreateDefaultPorts()
-        //{
-        //    // 输入在顶部
-        //    InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-        //    SetPortAlignment(InputExecution, PortAlignment.Top);
+        protected override void CreateDefaultPorts()
+        {
+            // 输入在顶部
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+            SetPortAlignment(InputExecution, PortAlignment.Top);
 
-        //    // 输出在底部
-        //    OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
-        //    SetPortAlignment(OutputExecution, PortAlignment.Bottom);
-        //}
+            // 输出在底部
+            OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
+        }
 
         protected override Color GetTitleColor()
         {
@@ -133,7 +133,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         protected override void OnCreate()
         {
             base.OnCreate();
-            this.Title = "📝 变量赋值";
+            this.Title = "变量赋值";
         }
 
         protected override Color GetTitleColor()

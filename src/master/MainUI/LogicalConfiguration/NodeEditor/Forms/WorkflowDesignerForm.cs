@@ -1,9 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-using MainUI.LogicalConfiguration.NodeEditor.Controls;
-using MainUI.LogicalConfiguration.NodeEditor.Nodes;
+﻿using MainUI.LogicalConfiguration.NodeEditor.Controls;
 using MainUI.LogicalConfiguration.NodeEditor.Core;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Forms
@@ -11,18 +6,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Forms
     /// <summary>
     /// 工作流设计器窗体 - 独立的可视化工作流编辑窗口
     /// </summary>
-    public class WorkflowDesignerForm : Form
+    public partial class WorkflowDesignerForm : Form
     {
-        #region 控件
-
-        private WorkflowDesignerPanel _designerPanel;
-        private StatusStrip _statusStrip;
-        private ToolStripStatusLabel _statusLabel;
-        private ToolStripStatusLabel _zoomLabel;
-        private ToolStripStatusLabel _nodeCountLabel;
-
-        #endregion
-
         #region 私有字段
 
         private List<ChildModel> _originalModels;
@@ -53,6 +38,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Forms
         {
             InitializeComponent();
             InitializeDesigner();
+
+            // 添加菜单栏
+            CreateMenuStrip();
         }
 
         /// <summary>
@@ -75,154 +63,6 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Forms
         #endregion
 
         #region 初始化
-
-        private void InitializeComponent()
-        {
-            this.SuspendLayout();
-
-            // 窗体属性
-            this.Text = "工作流设计器";
-            this.Size = new Size(1400, 900);
-            this.MinimumSize = new Size(1000, 600);
-            this.StartPosition = FormStartPosition.CenterParent;
-            this.Icon = SystemIcons.Application;
-
-            // 状态栏
-            _statusStrip = new StatusStrip
-            {
-                BackColor = Color.FromArgb(45, 45, 48)
-            };
-
-            _statusLabel = new ToolStripStatusLabel
-            {
-                Text = "就绪",
-                ForeColor = Color.White,
-                Spring = true,
-                TextAlign = ContentAlignment.MiddleLeft
-            };
-
-            _zoomLabel = new ToolStripStatusLabel
-            {
-                Text = "缩放: 100%",
-                ForeColor = Color.LightGray,
-                BorderSides = ToolStripStatusLabelBorderSides.Left,
-                BorderStyle = Border3DStyle.Etched
-            };
-
-            _nodeCountLabel = new ToolStripStatusLabel
-            {
-                Text = "节点: 0",
-                ForeColor = Color.LightGray,
-                BorderSides = ToolStripStatusLabelBorderSides.Left,
-                BorderStyle = Border3DStyle.Etched
-            };
-
-            _statusStrip.Items.AddRange(new ToolStripItem[]
-            {
-                _statusLabel,
-                _zoomLabel,
-                _nodeCountLabel
-            });
-
-            // 设计器面板
-            _designerPanel = new WorkflowDesignerPanel
-            {
-                Dock = DockStyle.Fill
-            };
-
-            // 添加控件
-            this.Controls.Add(_designerPanel);
-            this.Controls.Add(_statusStrip);
-
-            // 添加菜单栏
-            CreateMenuStrip();
-
-            this.ResumeLayout(false);
-            this.PerformLayout();
-        }
-
-        private void CreateMenuStrip()
-        {
-            var menuStrip = new MenuStrip
-            {
-                BackColor = Color.FromArgb(45, 45, 48),
-                ForeColor = Color.White
-            };
-
-            // 文件菜单
-            var fileMenu = new ToolStripMenuItem("文件(&F)");
-            fileMenu.DropDownItems.AddRange(new ToolStripItem[]
-            {
-                new ToolStripMenuItem("新建(&N)", null, OnMenuNew, Keys.Control | Keys.N),
-                new ToolStripMenuItem("打开(&O)...", null, OnMenuOpen, Keys.Control | Keys.O),
-                new ToolStripMenuItem("保存(&S)", null, OnMenuSave, Keys.Control | Keys.S),
-                new ToolStripMenuItem("另存为(&A)...", null, OnMenuSaveAs),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("导出为步骤列表(&E)...", null, OnMenuExport),
-                new ToolStripMenuItem("从步骤列表导入(&I)...", null, OnMenuImport),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("退出(&X)", null, OnMenuExit, Keys.Alt | Keys.F4)
-            });
-
-            // 编辑菜单
-            var editMenu = new ToolStripMenuItem("编辑(&E)");
-            editMenu.DropDownItems.AddRange(new ToolStripItem[]
-            {
-                new ToolStripMenuItem("撤销(&U)", null, null, Keys.Control | Keys.Z) { Enabled = false },
-                new ToolStripMenuItem("重做(&R)", null, null, Keys.Control | Keys.Y) { Enabled = false },
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("删除选中(&D)", null, OnMenuDelete, Keys.Delete),
-                new ToolStripMenuItem("全选(&A)", null, OnMenuSelectAll, Keys.Control | Keys.A)
-            });
-
-            // 视图菜单
-            var viewMenu = new ToolStripMenuItem("视图(&V)");
-            viewMenu.DropDownItems.AddRange(new ToolStripItem[]
-            {
-                new ToolStripMenuItem("放大(&I)", null, OnMenuZoomIn, Keys.Control | Keys.Add),
-                new ToolStripMenuItem("缩小(&O)", null, OnMenuZoomOut, Keys.Control | Keys.Subtract),
-                new ToolStripMenuItem("重置缩放(&R)", null, OnMenuZoomReset, Keys.Control | Keys.D0),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("自动布局(&L)", null, OnMenuAutoLayout)
-            });
-
-            // 工作流菜单
-            var workflowMenu = new ToolStripMenuItem("工作流(&W)");
-            workflowMenu.DropDownItems.AddRange(new ToolStripItem[]
-            {
-                new ToolStripMenuItem("验证(&V)", null, OnMenuValidate, Keys.F5),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("添加开始节点", null, (s, e) => AddNodeAtCenter("Start")),
-                new ToolStripMenuItem("添加结束节点", null, (s, e) => AddNodeAtCenter("End")),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("添加条件判断", null, (s, e) => AddNodeAtCenter("ConditionJudge")),
-                new ToolStripMenuItem("添加循环", null, (s, e) => AddNodeAtCenter("CycleBegins")),
-                new ToolStripMenuItem("添加延时等待", null, (s, e) => AddNodeAtCenter("DelayWait"))
-            });
-
-            // 帮助菜单
-            var helpMenu = new ToolStripMenuItem("帮助(&H)");
-            helpMenu.DropDownItems.AddRange(new ToolStripItem[]
-            {
-                new ToolStripMenuItem("使用说明(&H)", null, OnMenuHelp, Keys.F1),
-                new ToolStripSeparator(),
-                new ToolStripMenuItem("关于(&A)", null, OnMenuAbout)
-            });
-
-            menuStrip.Items.AddRange(new ToolStripItem[]
-            {
-                fileMenu, editMenu, viewMenu, workflowMenu, helpMenu
-            });
-
-            // 设置菜单项颜色
-            foreach (ToolStripMenuItem item in menuStrip.Items)
-            {
-                item.ForeColor = Color.White;
-            }
-
-            this.MainMenuStrip = menuStrip;
-            this.Controls.Add(menuStrip);
-        }
 
         private void InitializeDesigner()
         {
@@ -536,7 +376,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Forms
             // 转换为画布坐标
             var canvasPoint = _designerPanel.NodeEditor.ControlToCanvas(new Point(x, y));
 
-            _designerPanel.AddNode(stepName, (int)canvasPoint.X, (int)canvasPoint.Y);
+            _designerPanel.AddNode(stepName, canvasPoint.X, canvasPoint.Y);
         }
 
         #endregion

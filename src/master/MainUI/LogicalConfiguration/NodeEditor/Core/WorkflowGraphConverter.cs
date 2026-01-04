@@ -6,20 +6,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
     /// <summary>
     /// 工作流图转换器 - 在 STNodeEditor 图和 ChildModel 列表之间进行转换
     /// </summary>
-    public class WorkflowGraphConverter
+    public class WorkflowGraphConverter(STNodeEditor editor)
     {
         #region 私有字段
 
-        private readonly STNodeEditor _editor;
-
-        #endregion
-
-        #region 构造函数
-
-        public WorkflowGraphConverter(STNodeEditor editor)
-        {
-            _editor = editor ?? throw new ArgumentNullException(nameof(editor));
-        }
+        private readonly STNodeEditor _editor = editor ?? throw new ArgumentNullException(nameof(editor));
 
         #endregion
 
@@ -261,9 +252,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
             int yStep = 100;
 
             // 添加开始节点
-            var startNode = new StartNode();
-            startNode.Left = x;
-            startNode.Top = y;
+            var startNode = new StartNode
+            {
+                Left = x,
+                Top = y
+            };
             _editor.Nodes.Add(startNode);
 
             y += yStep;
@@ -283,9 +276,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
             }
 
             // 添加结束节点
-            var endNode = new EndNode();
-            endNode.Left = x;
-            endNode.Top = y;
+            var endNode = new EndNode
+            {
+                Left = x,
+                Top = y
+            };
             _editor.Nodes.Add(endNode);
 
             // 创建连接
@@ -548,16 +543,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
     /// <summary>
     /// 验证消息
     /// </summary>
-    public class ValidationMessage
+    public class ValidationMessage(ValidationLevel level, string message)
     {
-        public ValidationLevel Level { get; }
-        public string Message { get; }
+        public ValidationLevel Level { get; } = level;
 
-        public ValidationMessage(ValidationLevel level, string message)
-        {
-            Level = level;
-            Message = message;
-        }
+        public string Message { get; } = message;
     }
 
     /// <summary>

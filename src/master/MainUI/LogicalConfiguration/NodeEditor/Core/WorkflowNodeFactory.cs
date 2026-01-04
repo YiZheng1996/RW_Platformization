@@ -236,12 +236,13 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                     var instance = (WorkflowNodeBase)Activator.CreateInstance(nodeType);
                     string category = instance.CategoryPath ?? "其他";
 
-                    if (!result.ContainsKey(category))
+                    if (!result.TryGetValue(category, out List<NodeInfo> value))
                     {
-                        result[category] = new List<NodeInfo>();
+                        value = [];
+                        result[category] = value;
                     }
 
-                    result[category].Add(new NodeInfo
+                    value.Add(new NodeInfo
                     {
                         StepName = instance.StepName,
                         DisplayName = instance.DisplayName,
@@ -299,19 +300,14 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// <summary>
     /// 通用节点 - 用于未知类型
     /// </summary>
-    public class GenericNode : WorkflowNodeBase
+    public class GenericNode(string stepName) : WorkflowNodeBase
     {
-        private readonly string _stepName;
+        private readonly string _stepName = stepName ?? "Unknown";
 
         public override string StepName => _stepName;
         public override string DisplayName => _stepName;
         public override string CategoryPath => "其他";
         public override string Description => $"未知节点类型: {_stepName}";
-
-        public GenericNode(string stepName)
-        {
-            _stepName = stepName ?? "Unknown";
-        }
 
         // 无参构造函数（用于反序列化）
         public GenericNode() : this("Unknown") { }

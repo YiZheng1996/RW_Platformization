@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using ST.Library.UI.NodeEditor;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
@@ -241,15 +238,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         }
 
         /// <summary>
-        /// 创建默认端口,在节点类内部访问是允许的
+        /// 创建默认端口 - 上下方向,配合垂直布局
         /// </summary>
         protected virtual void CreateDefaultPorts()
         {
-            // 执行输入
+            // 执行输入 - 在顶部
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+            SetPortAlignment(InputExecution, PortAlignment.Top);
 
-            // 执行输出
+            // 执行输出 - 在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
+            SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         /// <summary>
@@ -484,7 +483,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                     case PortAlignment.Bottom:
                         // 可以隐藏文本或调整位置
                         return new Rectangle(0, 0, 0, 0); // 隐藏文本
-
+                    case PortAlignment.Left:
+                        break;
+                    case PortAlignment.Right:
+                        break;
                     default:
                         return base.OnSetOptionTextRectangle(op, rect, nIndex);
                 }
