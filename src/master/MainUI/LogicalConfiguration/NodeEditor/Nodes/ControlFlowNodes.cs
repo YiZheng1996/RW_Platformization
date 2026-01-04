@@ -77,26 +77,26 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            // 输入在顶部
-            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            SetPortAlignment(InputExecution, PortAlignment.Top);
-
-            // True 分支在右侧
-            OutputTrue = this.OutputOptions.Add("✓", ExecutionFlowType, false);
-            SetPortAlignment(OutputTrue, PortAlignment.Right);
-
-            // False 分支在左侧
-            OutputFalse = this.OutputOptions.Add("✗", ExecutionFlowType, false);
-            SetPortAlignment(OutputFalse, PortAlignment.Left);
-
-            //// 执行输入
+            //// 输入在顶部
             //InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+            //SetPortAlignment(InputExecution, PortAlignment.Top);
 
-            //// True 分支 (绿色)
-            //OutputTrue = this.OutputOptions.Add("✓ True", ExecutionFlowType, false);
+            //// True 分支在右侧
+            //OutputTrue = this.OutputOptions.Add("✓", ExecutionFlowType, false);
+            //SetPortAlignment(OutputTrue, PortAlignment.Right);
 
-            //// False 分支 (红色)
-            //OutputFalse = this.OutputOptions.Add("✗ False", ExecutionFlowType, false);
+            //// False 分支在左侧
+            //OutputFalse = this.OutputOptions.Add("✗", ExecutionFlowType, false);
+            //SetPortAlignment(OutputFalse, PortAlignment.Left);
+
+            // 执行输入
+            InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
+
+            // True 分支 (绿色)
+            OutputTrue = this.OutputOptions.Add("✓ True", ExecutionFlowType, false);
+
+            // False 分支 (红色)
+            OutputFalse = this.OutputOptions.Add("✗ False", ExecutionFlowType, false);
         }
 
         protected override void OnOwnerChanged()
