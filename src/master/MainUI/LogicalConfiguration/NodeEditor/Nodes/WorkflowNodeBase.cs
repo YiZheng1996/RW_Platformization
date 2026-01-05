@@ -238,14 +238,14 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         }
 
         /// <summary>
-        /// 创建默认端口 - 上下方向,配合垂直布局
+        /// 创建默认端口 - 左右方向
         /// </summary>
         protected virtual void CreateDefaultPorts()
         {
-            // 执行输入 - 在顶部
+            // 执行输入 - 在左侧
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
 
-            // 执行输出 - 在底部
+            // 执行输出 - 在右侧
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
         }
 
@@ -480,7 +480,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
     /// </summary>
     public class ExecutionFlow
     {
-        public static readonly ExecutionFlow Instance = new ExecutionFlow();
+        public static readonly ExecutionFlow Instance = new();
     }
 
 

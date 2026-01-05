@@ -2,6 +2,7 @@
 using MainUI.LogicalConfiguration.Engine;
 using MainUI.LogicalConfiguration.LogicalManager;
 using MainUI.LogicalConfiguration.Methods;
+using MainUI.LogicalConfiguration.NodeEditor.Core;
 using MainUI.LogicalConfiguration.Services;
 using MainUI.Service;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,6 +41,9 @@ namespace MainUI
 
                 // 检查单例运行
                 EnsureSingleInstance();
+
+                // 初始化节点编辑器系统
+                InitializeNodeSystem();
 
                 // 显示登录界面并启动主程序
                 RunApplication();
@@ -295,5 +299,20 @@ namespace MainUI
 
         }
         #endregion
+
+        /// <summary>
+        /// 初始化节点编辑器系统
+        /// </summary>
+        private static void InitializeNodeSystem()
+        {
+            // 触发单例初始化，自动注册所有窗体
+            var adapter = NodeConfigAdapter.Instance;
+
+            // 可选：输出日志验证
+            System.Diagnostics.Debug.WriteLine("NodeConfigAdapter 已初始化");
+
+            // 可选：添加额外的自定义注册
+            // adapter.RegisterFormFactory("CustomNode", node => new Form_Custom());
+        }
     }
 }

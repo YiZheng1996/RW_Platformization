@@ -1,10 +1,9 @@
 ﻿using AntdUI;
-using MainUI.LogicalConfiguration.Forms;
 using MainUI.LogicalConfiguration.Parameter;
 using MainUI.LogicalConfiguration.Services;
 using Microsoft.Extensions.Logging;
 
-namespace MainUI.Procedure.DSL.LogicalConfiguration.Forms
+namespace MainUI.LogicalConfiguration.Forms
 {
     /// <summary>
     /// 延时参数配置表单

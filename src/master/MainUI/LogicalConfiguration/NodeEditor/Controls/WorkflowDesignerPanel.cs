@@ -248,18 +248,16 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 
         private void OnEditorDoubleClick(object sender, MouseEventArgs e)
         {
-            var node = _nodeEditor.ActiveNode as WorkflowNodeBase;
-            if (node != null)
-            {
-                // 触发双击事件
-                var args = new NodeDoubleClickEventArgs(node);
-                NodeDoubleClick?.Invoke(this, args);
+            if (_nodeEditor.ActiveNode is not WorkflowNodeBase node) return;
 
-                if (!args.Handled)
-                {
-                    // 默认打开配置对话框
-                    node.OpenConfigDialog();
-                }
+            // 触发双击事件
+            var args = new NodeDoubleClickEventArgs(node);
+            NodeDoubleClick?.Invoke(this, args);
+
+            if (!args.Handled)
+            {
+                // 默认打开配置对话框
+                node.OpenConfigDialog();
             }
         }
 
@@ -271,45 +269,41 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
                 DeleteSelectedNodes();
                 e.Handled = true;
             }
-            // Ctrl+A 全选
-            else if (e.Control && e.KeyCode == Keys.A)
+            else switch (e.Control)
             {
-                SelectAllNodes();
-                e.Handled = true;
-            }
-            // Ctrl+S 保存
-            else if (e.Control && e.KeyCode == Keys.S)
-            {
-                OnSaveClick(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            //  新增：复制
-            else if (e.Control && e.KeyCode == Keys.C)
-            {
-                OnCopyNode(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            //  新增：粘贴
-            else if (e.Control && e.KeyCode == Keys.V)
-            {
-                OnPasteNode(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            //  新增：缩放快捷键
-            else if (e.Control && e.KeyCode == Keys.Add)
-            {
-                OnZoomInClick(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.Subtract)
-            {
-                OnZoomOutClick(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.D0)
-            {
-                OnZoomResetClick(sender, EventArgs.Empty);
-                e.Handled = true;
+                // Ctrl+A 全选
+                case true when e.KeyCode == Keys.A:
+                    SelectAllNodes();
+                    e.Handled = true;
+                    break;
+                // Ctrl+S 保存
+                case true when e.KeyCode == Keys.S:
+                    OnSaveClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                //  新增：复制
+                case true when e.KeyCode == Keys.C:
+                    OnCopyNode(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                //  新增：粘贴
+                case true when e.KeyCode == Keys.V:
+                    OnPasteNode(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                //  新增：缩放快捷键
+                case true when e.KeyCode == Keys.Add:
+                    OnZoomInClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case true when e.KeyCode == Keys.Subtract:
+                    OnZoomOutClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case true when e.KeyCode == Keys.D0:
+                    OnZoomResetClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
             }
         }
 
@@ -1083,33 +1077,31 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         /// </summary>
         private void OnEditorKeyDownEnhanced(object sender, KeyEventArgs e)
         {
-            // 复制
-            if (e.Control && e.KeyCode == Keys.C)
+            switch (e.Control)
             {
-                OnCopyNode(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            // 粘贴
-            else if (e.Control && e.KeyCode == Keys.V)
-            {
-                OnPasteNode(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            // 缩放
-            else if (e.Control && e.KeyCode == Keys.Add)
-            {
-                OnZoomInClick(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.Subtract)
-            {
-                OnZoomOutClick(sender, EventArgs.Empty);
-                e.Handled = true;
-            }
-            else if (e.Control && e.KeyCode == Keys.D0)
-            {
-                OnZoomResetClick(sender, EventArgs.Empty);
-                e.Handled = true;
+                // 复制
+                case true when e.KeyCode == Keys.C:
+                    OnCopyNode(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                // 粘贴
+                case true when e.KeyCode == Keys.V:
+                    OnPasteNode(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                // 缩放
+                case true when e.KeyCode == Keys.Add:
+                    OnZoomInClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case true when e.KeyCode == Keys.Subtract:
+                    OnZoomOutClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
+                case true when e.KeyCode == Keys.D0:
+                    OnZoomResetClick(sender, EventArgs.Empty);
+                    e.Handled = true;
+                    break;
             }
         }
 

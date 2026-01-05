@@ -37,13 +37,13 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
                 if (Parameter == null)
                     return "未配置";
 
-                double ms = Parameter.T;
-                if (ms < 1000)
-                    return $"等待 {ms:F0} 毫秒";
-                else if (ms < 60000)
-                    return $"等待 {ms / 1000:F1} 秒";
-                else
-                    return $"等待 {ms / 60000:F1} 分钟";
+                var ms = Parameter.T;
+                return ms switch
+                {
+                    < 1000 => $"等待 {ms:F0} 毫秒",
+                    < 60000 => $"等待 {ms / 1000:F1} 秒",
+                    _ => $"等待 {ms / 60000:F1} 分钟"
+                };
             }
         }
 

@@ -1,4 +1,4 @@
-﻿namespace MainUI.Procedure.DSL.LogicalConfiguration.Forms
+﻿namespace MainUI.LogicalConfiguration.Forms
 {
     partial class Form_DelayTime
     {

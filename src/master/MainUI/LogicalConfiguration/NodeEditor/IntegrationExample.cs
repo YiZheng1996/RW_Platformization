@@ -27,6 +27,7 @@
  * ============================================================================
  */
 
+using MainUI.LogicalConfiguration.Forms;
 using MainUI.LogicalConfiguration.NodeEditor.Controls;
 using MainUI.LogicalConfiguration.NodeEditor.Forms;
 using MainUI.LogicalConfiguration.Parameter;

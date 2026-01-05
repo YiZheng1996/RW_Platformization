@@ -35,26 +35,43 @@ namespace MainUI.LogicalConfiguration.Forms
 
         #region 构造函数
 
+        public Form_ReadPLC()
+        {
+            if (DesignMode) return;
+            try
+            {
+                _isLoading = true;
+                InitializeForm();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Form_ReadPLC 初始化失败");
+                MessageHelper.MessageOK($"初始化失败:{ex.Message}", TType.Error);
+            }
+            finally
+            {
+                _isLoading = false;
+            }
+        }
+
         public Form_ReadPLC(ILogger<Form_ReadPLC> logger) : base()
         {
             InitializeComponent();
 
-            if (!DesignMode)
+            if (DesignMode) return;
+            try
             {
-                try
-                {
-                    _isLoading = true;
-                    InitializeForm();
-                }
-                catch (Exception ex)
-                {
-                    _logger?.LogError(ex, "Form_ReadPLC 初始化失败");
-                    MessageHelper.MessageOK($"初始化失败:{ex.Message}", TType.Error);
-                }
-                finally
-                {
-                    _isLoading = false;
-                }
+                _isLoading = true;
+                InitializeForm();
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "Form_ReadPLC 初始化失败");
+                MessageHelper.MessageOK($"初始化失败:{ex.Message}", TType.Error);
+            }
+            finally
+            {
+                _isLoading = false;
             }
         }
 

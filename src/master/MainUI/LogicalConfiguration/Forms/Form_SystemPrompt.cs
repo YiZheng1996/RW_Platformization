@@ -10,6 +10,12 @@ namespace MainUI.LogicalConfiguration.Forms
         private readonly IWorkflowStateService _workflowStateService;
         private readonly ILogger<Form_SystemPrompt> _logger;
 
+        public Form_SystemPrompt()
+        {
+            InitializeComponent();
+            InitForm();
+        }
+
         public Form_SystemPrompt(IWorkflowStateService workflowStateService, ILogger<Form_SystemPrompt> logger)
         {
             _workflowStateService = workflowStateService;
