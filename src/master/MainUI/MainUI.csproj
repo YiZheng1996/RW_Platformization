@@ -151,7 +151,6 @@
     <PackageReference Include="NLog" Version="6.0.5" />
     <PackageReference Include="NLog.Database" Version="6.0.3" />
     <PackageReference Include="NLog.Extensions.Logging" Version="6.0.5" />
-    <PackageReference Include="ST.Library.UI" Version="2.0.0" />
     <PackageReference Include="SunnyUI" Version="3.8.8" />
     <PackageReference Include="System.Data.SqlClient" Version="4.9.0" />
     <PackageReference Include="System.IO.Ports" Version="9.0.9" />
@@ -193,6 +192,9 @@
     </Reference>
     <Reference Include="RWDSLDebugger">
       <HintPath>..\Lib\DSL_DLL\RWDSLDebugger.dll</HintPath>
+    </Reference>
+    <Reference Include="ST.Library.UI">
+      <HintPath>..\Lib\ST.Library.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

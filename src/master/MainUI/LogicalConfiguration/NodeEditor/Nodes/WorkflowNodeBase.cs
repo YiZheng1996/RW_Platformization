@@ -244,11 +244,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
         {
             // 执行输入 - 在顶部
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
-            //SetPortAlignment(InputExecution, PortAlignment.Top);
 
             // 执行输出 - 在底部
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
-            //SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
 
         /// <summary>
@@ -317,19 +315,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             int width = this.Width - 20;
 
             // 设置字体和颜色
-            using (var font = new Font("微软雅黑", 8f))
-            using (var brush = new SolidBrush(IsConfigured ? Color.LightGreen : Color.Orange))
+            using var font = new Font("微软雅黑", 8f);
+            using var brush = new SolidBrush(IsConfigured ? Color.LightGreen : Color.Orange);
+            // 截断过长的文本
+            string displayText = summary;
+            SizeF textSize = g.MeasureString(displayText, font);
+            if (textSize.Width > width)
             {
-                // 截断过长的文本
-                string displayText = summary;
-                SizeF textSize = g.MeasureString(displayText, font);
-                if (textSize.Width > width)
-                {
-                    displayText = TruncateText(displayText, font, width, g);
-                }
-
-                g.DrawString(displayText, font, brush, x, y);
+                displayText = TruncateText(displayText, font, width, g);
             }
+
+            g.DrawString(displayText, font, brush, x, y);
         }
 
         /// <summary>
@@ -410,89 +406,6 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             this.IsConfigured = model.StepParameter != null &&
                                !(model.StepParameter is int) &&
                                !(model.StepParameter is long);
-        }
-
-        #endregion
-
-        #region 端口位置配置
-
-        /// <summary>
-        /// 端口对齐方式枚举
-        /// </summary>
-        protected enum PortAlignment
-        {
-            Left,
-            Right,
-            Top,
-            Bottom
-        }
-
-        /// <summary>
-        /// 端口位置配置字典
-        /// </summary>
-        protected Dictionary<STNodeOption, PortAlignment> _portAlignments = [];
-
-        /// <summary>
-        /// 设置端口对齐方式
-        /// </summary>
-        protected void SetPortAlignment(STNodeOption port, PortAlignment alignment)
-        {
-            if (port != null)
-            {
-                _portAlignments[port] = alignment;
-            }
-        }
-
-        /// <summary>
-        /// 重写端口连接点位置设置
-        /// </summary>
-        protected override Point OnSetOptionDotLocation(STNodeOption op, Point pt, int nIndex)
-        {
-            // 如果没有自定义配置，使用默认位置
-            if (!_portAlignments.TryGetValue(op, out var alignment))
-            {
-                return base.OnSetOptionDotLocation(op, pt, nIndex);
-            }
-
-            // 计算节点中心位置
-            int centerX = this.Width / 2;
-            int centerY = this.TitleHeight + (this.Height - this.TitleHeight) / 2;
-
-            // 根据对齐方式返回新的端口位置
-            return alignment switch
-            {
-                PortAlignment.Top => new Point(centerX - 5, this.TitleHeight - 5),
-                PortAlignment.Bottom => new Point(centerX - 5, this.Height - 5),
-                PortAlignment.Left => new Point(-5, centerY - 5),
-                PortAlignment.Right => new Point(this.Width - 5, centerY - 5),
-                _ => base.OnSetOptionDotLocation(op, pt, nIndex),
-            };
-        }
-
-        /// <summary>
-        /// 重写端口文本区域设置（可选）
-        /// </summary>
-        protected override Rectangle OnSetOptionTextRectangle(STNodeOption op, Rectangle rect, int nIndex)
-        {
-            // 如果端口在上下位置，可能需要调整文本显示位置
-            if (_portAlignments.TryGetValue(op, out var alignment))
-            {
-                switch (alignment)
-                {
-                    case PortAlignment.Top:
-                    case PortAlignment.Bottom:
-                        // 可以隐藏文本或调整位置
-                        return new Rectangle(0, 0, 0, 0); // 隐藏文本
-                    case PortAlignment.Left:
-                        break;
-                    case PortAlignment.Right:
-                        break;
-                    default:
-                        return base.OnSetOptionTextRectangle(op, rect, nIndex);
-                }
-            }
-
-            return base.OnSetOptionTextRectangle(op, rect, nIndex);
         }
 
         #endregion

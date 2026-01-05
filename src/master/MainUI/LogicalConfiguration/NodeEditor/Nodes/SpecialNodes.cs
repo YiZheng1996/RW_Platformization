@@ -25,7 +25,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             base.OnCreate();
 
             this.Size = new Size(100, 50);
-            this.Title = "开始";
+            this.Title = "开始流程";
+        }
+
+        protected override void OnOwnerChanged()
+        {
+            base.OnOwnerChanged();
+            if (this.Owner != null)
+            {
+                // 设置执行流类型的颜色 - 使用白色
+                this.Owner?.SetTypeColor(ExecutionFlowType, Color.White);
+            }
         }
 
         protected override Color GetTitleColor()
@@ -39,23 +49,23 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
         }
 
-        protected override void OnDrawBody(DrawingTools dt)
-        {
-            // 开始节点不需要绘制配置摘要
-            Graphics g = dt.Graphics;
+        //protected override void OnDrawBody(DrawingTools dt)
+        //{
+        //    // 开始节点不需要绘制配置摘要
+        //    Graphics g = dt.Graphics;
 
-            // 绘制圆形背景
-            int padding = 5;
-            Rectangle rect = new(
-                this.Left + padding,
-                this.Top + this.TitleHeight + padding,
-                this.Width - padding * 2,
-                this.Height - this.TitleHeight - padding * 2
-            );
+        //    // 绘制圆形背景
+        //    int padding = 5;
+        //    Rectangle rect = new(
+        //        this.Left + padding,
+        //        this.Top + this.TitleHeight + padding,
+        //        this.Width - padding * 2,
+        //        this.Height - this.TitleHeight - padding * 2
+        //    );
 
-            using var brush = new SolidBrush(Color.FromArgb(50, 40, 167, 69));
-            g.FillEllipse(brush, rect);
-        }
+        //    using var brush = new SolidBrush(Color.FromArgb(50, 40, 167, 69));
+        //    g.FillEllipse(brush, rect);
+        //}
     }
 
     #endregion
@@ -123,32 +133,30 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
             this.Invalidate();
         }
 
-        protected override void OnDrawBody(DrawingTools dt)
-        {
-            Graphics g = dt.Graphics;
+        //protected override void OnDrawBody(DrawingTools dt)
+        //{
+        //    Graphics g = dt.Graphics;
 
-            // 绘制圆形背景
-            int padding = 5;
-            Rectangle rect = new Rectangle(
-                this.Left + padding,
-                this.Top + this.TitleHeight + padding,
-                this.Width - padding * 2,
-                this.Height - this.TitleHeight - padding * 2
-            );
+        //    // 绘制圆形背景
+        //    int padding = 5;
+        //    Rectangle rect = new(
+        //        this.Left + padding,
+        //        this.Top + this.TitleHeight + padding,
+        //        this.Width - padding * 2,
+        //        this.Height - this.TitleHeight - padding * 2
+        //    );
 
-            Color bgColor = Status switch
-            {
-                EndStatus.Success => Color.FromArgb(50, 40, 167, 69),
-                EndStatus.Failure => Color.FromArgb(50, 220, 53, 69),
-                EndStatus.Abort => Color.FromArgb(50, 255, 193, 7),
-                _ => Color.FromArgb(50, 108, 117, 125)
-            };
+        //    Color bgColor = Status switch
+        //    {
+        //        EndStatus.Success => Color.FromArgb(50, 40, 167, 69),
+        //        EndStatus.Failure => Color.FromArgb(50, 220, 53, 69),
+        //        EndStatus.Abort => Color.FromArgb(50, 255, 193, 7),
+        //        _ => Color.FromArgb(50, 108, 117, 125)
+        //    };
 
-            using (var brush = new SolidBrush(bgColor))
-            {
-                g.FillEllipse(brush, rect);
-            }
-        }
+        //    using var brush = new SolidBrush(bgColor);
+        //    g.FillEllipse(brush, rect);
+        //}
 
         protected override void OnSaveNodeData(System.Collections.Generic.Dictionary<string, byte[]> dic)
         {

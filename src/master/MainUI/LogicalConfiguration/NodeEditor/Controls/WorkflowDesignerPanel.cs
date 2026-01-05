@@ -116,6 +116,8 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         public WorkflowDesignerPanel()
         {
             InitializeComponent();
+            _nodeEditor.SetTypeColor(typeof(ExecutionFlow), Color.White);
+
             InitializeNodeEditor();
             RegisterNodeTypes();
             BindEvents();
@@ -447,6 +449,41 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
                 Top = 300
             };
             _nodeEditor.Nodes.Add(endNode);
+
+            // ========== 详细调试 ==========
+            System.Diagnostics.Debug.WriteLine("=== StartNode 详细检查 ===");
+            System.Diagnostics.Debug.WriteLine($"输出端口数: {startNode.OutputOptionsCount}");
+            System.Diagnostics.Debug.WriteLine($"OutputExecution: {startNode.OutputExecution?.Text ?? "null"}");
+
+            if (startNode.OutputExecution != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"  端口颜色 (DotColor): {startNode.OutputExecution.DotColor}");
+                System.Diagnostics.Debug.WriteLine($"  端口类型: {startNode.OutputExecution.DataType}");
+                System.Diagnostics.Debug.WriteLine($"  是否单连接: {startNode.OutputExecution.IsSingle}");
+            }
+
+            System.Diagnostics.Debug.WriteLine("=== EndNode 详细检查 ===");
+            System.Diagnostics.Debug.WriteLine($"输入端口数: {endNode.InputOptionsCount}");
+            System.Diagnostics.Debug.WriteLine($"InputExecution: {endNode.InputExecution?.Text ?? "null"}");
+
+            if (endNode.InputExecution != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"  端口颜色 (DotColor): {endNode.InputExecution.DotColor}");
+                System.Diagnostics.Debug.WriteLine($"  端口类型: {endNode.InputExecution.DataType}");
+                System.Diagnostics.Debug.WriteLine($"  是否单连接: {endNode.InputExecution.IsSingle}");
+            }
+
+            // 检查编辑器的类型颜色设置
+            System.Diagnostics.Debug.WriteLine("=== 编辑器类型颜色检查 ===");
+            System.Diagnostics.Debug.WriteLine($"Editor Owner: {startNode.Owner != null}");
+
+            if (startNode.Owner != null)
+            {
+                // 尝试获取 ExecutionFlowType 的颜色
+                // 注意: STNodeEditor 可能没有公开的 API 来获取类型颜色
+                System.Diagnostics.Debug.WriteLine("StartNode 已添加到编辑器");
+            }
+            // ========== 调试结束 ==========
 
             // 连接开始和结束 - 使用公共方法
             startNode.ConnectTo(endNode);

@@ -132,11 +132,11 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Nodes
 
         protected override void CreateDefaultPorts()
         {
-            // 执行输入 - 在顶部
+            // 执行输入
             InputExecution = this.InputOptions.Add("▶", ExecutionFlowType, true);
             //SetPortAlignment(InputExecution, PortAlignment.Top);
 
-            // 执行输出 - 在底部
+            // 执行输出
             OutputExecution = this.OutputOptions.Add("▶", ExecutionFlowType, false);
             //SetPortAlignment(OutputExecution, PortAlignment.Bottom);
         }
