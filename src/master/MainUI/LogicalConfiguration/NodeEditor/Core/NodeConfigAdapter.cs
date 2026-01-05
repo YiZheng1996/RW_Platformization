@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
 using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using MainUI.LogicalConfiguration.Parameter;
 using MainUI.LogicalConfiguration.Forms;
@@ -41,12 +37,12 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Core
         /// <summary>
         /// StepName 到配置窗体类型的映射
         /// </summary>
-        private readonly Dictionary<string, Type> _configFormTypes = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Type> _configFormTypes = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// StepName 到配置窗体工厂的映射
         /// </summary>
-        private readonly Dictionary<string, Func<WorkflowNodeBase, Form>> _configFormFactories = new Dictionary<string, Func<WorkflowNodeBase, Form>>(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<string, Func<WorkflowNodeBase, Form>> _configFormFactories = new(StringComparer.OrdinalIgnoreCase);
 
         /// <summary>
         /// 服务提供者（用于依赖注入）

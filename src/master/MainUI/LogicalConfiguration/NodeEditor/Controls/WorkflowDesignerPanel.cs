@@ -2,7 +2,6 @@
 using MainUI.LogicalConfiguration.NodeEditor.Nodes;
 using ST.Library.UI.NodeEditor;
 using System.ComponentModel;
-using Timer = System.Windows.Forms.Timer;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 {
@@ -254,11 +253,24 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             var args = new NodeDoubleClickEventArgs(node);
             NodeDoubleClick?.Invoke(this, args);
 
-            if (!args.Handled)
+            if (args.Handled) return;
+            // 使用适配器打开配置窗体
+            var result = NodeConfigAdapter.Instance.OpenConfigForm(node,
+                this.FindForm()  // 父窗体
+            );
+
+            if (result.Success)
             {
-                // 默认打开配置对话框
-                node.OpenConfigDialog();
+                // 刷新节点显示（显示配置摘要）
+                node.RefreshDisplay();
+
+                // 标记为已修改
+                IsDirty = true;
+
+                // 触发工作流变化事件
+                WorkflowChanged?.Invoke(this, EventArgs.Empty);
             }
+            args.Handled = true;
         }
 
         private void OnEditorKeyDown(object sender, KeyEventArgs e)
