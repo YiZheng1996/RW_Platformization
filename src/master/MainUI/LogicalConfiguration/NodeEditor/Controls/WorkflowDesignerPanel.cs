@@ -108,6 +108,17 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             get => _nodeEditor?.ActiveNode as WorkflowNodeBase;
         }
 
+        /// <summary>
+        /// 配置面板
+        /// </summary>
+        [Browsable(false)]
+        public NodeConfigHostPanel ConfigPanel => _configHostPanel;
+
+        /// <summary>
+        /// 是否有未保存的配置更改
+        /// </summary>
+        public bool HasUnsavedConfig => _configHostPanel?.HasChanges ?? false;
+
         #endregion
 
         #region 构造函数
@@ -122,6 +133,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             BindEvents();
 
             InitializeEnhancements();
+            InitializeConfigPanel();
         }
 
         private void InitializeEnhancements()
@@ -142,16 +154,85 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 
         #endregion
 
+        #region 新增方法
+
+        /// <summary>
+        /// 初始化配置面板
+        /// </summary>
+        private void InitializeConfigPanel()
+        {
+            if (_configHostPanel == null) return;
+
+            // 监听配置保存事件
+            _configHostPanel.ConfigurationSaved += (s, e) =>
+            {
+                if (e.Success)
+                {
+                    // 标记为已修改
+                    IsDirty = true;
+
+                    // 触发工作流变化事件
+                    WorkflowChanged?.Invoke(this, EventArgs.Empty);
+
+                    // 刷新节点显示
+                    e.Node?.RefreshDisplay();
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"配置保存失败: {e.ErrorMessage}");
+                }
+            };
+
+            // 监听配置变更事件（有未保存的更改）
+            _configHostPanel.ConfigurationChanged += (s, e) =>
+            {
+                // 可以在标题显示未保存标记
+                UpdateTitle();
+            };
+
+            // 注册额外的自定义配置面板（如果有的话）
+            // _configHostPanel.RegisterPanel("CustomStep", () => new CustomConfigPanel());
+        }
+
+        /// <summary>
+        /// 注册自定义配置面板
+        /// </summary>
+        public void RegisterConfigPanel(string stepName, Func<NodeConfigPanelBase> factory)
+        {
+            _configHostPanel?.RegisterPanel(stepName, factory);
+        }
+
+        /// <summary>
+        /// 注册自定义配置面板（泛型版本）
+        /// </summary>
+        public void RegisterConfigPanel<T>(string stepName) where T : NodeConfigPanelBase, new()
+        {
+            _configHostPanel?.RegisterPanel<T>(stepName);
+        }
+
+        #endregion
+
         #region 初始化
 
         private void InitializeNodeEditor()
         {
             _converter = new WorkflowGraphConverter(_nodeEditor);
 
-            // 关联属性网格
+            // ★ 修改：同时更新属性网格和配置面板 ★
             _nodeEditor.ActiveChanged += (s, e) =>
             {
+                // 更新属性网格
                 _propertyGrid.SetNode(_nodeEditor.ActiveNode);
+
+                // ★ 新增：更新配置面板 ★
+                if (_nodeEditor.ActiveNode is WorkflowNodeBase workflowNode)
+                {
+                    _configHostPanel?.SetNode(workflowNode);
+                }
+                else
+                {
+                    _configHostPanel?.Clear();
+                }
             };
         }
 
@@ -254,23 +335,57 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             NodeDoubleClick?.Invoke(this, args);
 
             if (args.Handled) return;
-            // 使用适配器打开配置窗体
-            var result = NodeConfigAdapter.Instance.OpenConfigForm(node,
-                this.FindForm()  // 父窗体
-            );
 
-            if (result.Success)
+            // ========================================
+            // 方案A: 完全使用嵌入式配置面板（推荐）
+            // ========================================
+
+            // 确保配置面板显示当前节点
+            _configHostPanel?.SetNode(node);
+
+            // 标记事件已处理
+            args.Handled = true;
+
+            // ========================================
+            // 方案B: 混合模式 - 某些节点使用弹窗
+            // ========================================
+            // 取消注释以下代码启用混合模式
+            /*
+            // 判断是否需要使用弹窗（复杂配置的节点）
+            if (ShouldUsePopupConfig(node.StepName))
             {
-                // 刷新节点显示（显示配置摘要）
-                node.RefreshDisplay();
-
-                // 标记为已修改
-                IsDirty = true;
-
-                // 触发工作流变化事件
-                WorkflowChanged?.Invoke(this, EventArgs.Empty);
+                // 使用原有的弹窗方式
+                var result = NodeConfigAdapter.Instance.OpenConfigForm(node, this.FindForm());
+                if (result.Success)
+                {
+                    node.RefreshDisplay();
+                    IsDirty = true;
+                    WorkflowChanged?.Invoke(this, EventArgs.Empty);
+                }
+            }
+            else
+            {
+                // 使用嵌入式配置面板
+                _configHostPanel?.SetNode(node);
             }
             args.Handled = true;
+            */
+        }
+
+        /// <summary>
+        /// 判断是否应该使用弹窗配置
+        /// 对于特别复杂的节点，可能弹窗更合适
+        /// </summary>
+        private bool ShouldUsePopupConfig(string stepName)
+        {
+            // 这些节点配置比较复杂，建议使用弹窗
+            // 如果你觉得嵌入式面板足够用，可以返回 false
+            return stepName switch
+            {
+                "CycleBegins" => true,     // 循环有子步骤配置，可能需要更大空间
+                // "ConditionJudge" => true, // 条件表达式编辑器
+                _ => false
+            };
         }
 
         private void OnEditorKeyDown(object sender, KeyEventArgs e)
@@ -359,6 +474,9 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 
         private void OnSaveClick(object sender, EventArgs e)
         {
+            // 先检查并保存当前配置
+            if (!CheckAndSaveConfig()) return;
+
             if (string.IsNullOrEmpty(_currentFilePath))
             {
                 using (var dialog = new SaveFileDialog())
@@ -379,6 +497,40 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             }
 
             SaveWorkflow(_currentFilePath);
+        }
+
+        /// <summary>
+        /// 保存前检查是否有未保存的配置
+        /// </summary>
+        private bool CheckAndSaveConfig()
+        {
+            if (_configHostPanel?.HasChanges != true) return true;
+            var result = MessageBox.Show(
+                "当前节点配置有未保存的更改，是否保存？",
+                "保存确认",
+                MessageBoxButtons.YesNoCancel,
+                MessageBoxIcon.Question);
+
+            switch (result)
+            {
+                case DialogResult.Yes:
+                    return _configHostPanel.SaveCurrentConfig();
+                case DialogResult.No:
+                    return true; // 不保存，继续
+                case DialogResult.Cancel:
+                    return false; // 取消操作
+                case DialogResult.None:
+                case DialogResult.OK:
+                case DialogResult.Abort:
+                case DialogResult.Retry:
+                case DialogResult.Ignore:
+                case DialogResult.TryAgain:
+                case DialogResult.Continue:
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+            return true;
         }
 
         private void OnValidateClick(object sender, EventArgs e)
@@ -456,41 +608,6 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             };
             _nodeEditor.Nodes.Add(endNode);
 
-            // ========== 详细调试 ==========
-            System.Diagnostics.Debug.WriteLine("=== StartNode 详细检查 ===");
-            System.Diagnostics.Debug.WriteLine($"输出端口数: {startNode.OutputOptionsCount}");
-            System.Diagnostics.Debug.WriteLine($"OutputExecution: {startNode.OutputExecution?.Text ?? "null"}");
-
-            if (startNode.OutputExecution != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"  端口颜色 (DotColor): {startNode.OutputExecution.DotColor}");
-                System.Diagnostics.Debug.WriteLine($"  端口类型: {startNode.OutputExecution.DataType}");
-                System.Diagnostics.Debug.WriteLine($"  是否单连接: {startNode.OutputExecution.IsSingle}");
-            }
-
-            System.Diagnostics.Debug.WriteLine("=== EndNode 详细检查 ===");
-            System.Diagnostics.Debug.WriteLine($"输入端口数: {endNode.InputOptionsCount}");
-            System.Diagnostics.Debug.WriteLine($"InputExecution: {endNode.InputExecution?.Text ?? "null"}");
-
-            if (endNode.InputExecution != null)
-            {
-                System.Diagnostics.Debug.WriteLine($"  端口颜色 (DotColor): {endNode.InputExecution.DotColor}");
-                System.Diagnostics.Debug.WriteLine($"  端口类型: {endNode.InputExecution.DataType}");
-                System.Diagnostics.Debug.WriteLine($"  是否单连接: {endNode.InputExecution.IsSingle}");
-            }
-
-            // 检查编辑器的类型颜色设置
-            System.Diagnostics.Debug.WriteLine("=== 编辑器类型颜色检查 ===");
-            System.Diagnostics.Debug.WriteLine($"Editor Owner: {startNode.Owner != null}");
-
-            if (startNode.Owner != null)
-            {
-                // 尝试获取 ExecutionFlowType 的颜色
-                // 注意: STNodeEditor 可能没有公开的 API 来获取类型颜色
-                System.Diagnostics.Debug.WriteLine("StartNode 已添加到编辑器");
-            }
-            // ========== 调试结束 ==========
-
             // 连接开始和结束 - 使用公共方法
             startNode.ConnectTo(endNode);
 
@@ -506,19 +623,22 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         {
             try
             {
-                string ext = System.IO.Path.GetExtension(filePath).ToLower();
+                var ext = System.IO.Path.GetExtension(filePath).ToLower();
 
-                if (ext == ".stn")
+                switch (ext)
                 {
-                    // 使用 STNodeEditor 原生保存
-                    _nodeEditor.SaveCanvas(filePath);
-                }
-                else if (ext == ".json")
-                {
-                    // 转换为 ChildModel 并保存为 JSON
-                    var models = _converter.ConvertToChildModels();
-                    string json = Newtonsoft.Json.JsonConvert.SerializeObject(models, Newtonsoft.Json.Formatting.Indented);
-                    System.IO.File.WriteAllText(filePath, json);
+                    case ".stn":
+                        // 使用 STNodeEditor 原生保存
+                        _nodeEditor.SaveCanvas(filePath);
+                        break;
+                    case ".json":
+                    {
+                        // 转换为 ChildModel 并保存为 JSON
+                        var models = _converter.ConvertToChildModels();
+                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(models, Newtonsoft.Json.Formatting.Indented);
+                        System.IO.File.WriteAllText(filePath, json);
+                        break;
+                    }
                 }
 
                 _currentFilePath = filePath;
@@ -538,20 +658,23 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         {
             try
             {
-                string ext = System.IO.Path.GetExtension(filePath).ToLower();
+                var ext = System.IO.Path.GetExtension(filePath).ToLower();
 
-                if (ext == ".stn")
+                switch (ext)
                 {
-                    // 使用 STNodeEditor 原生加载
-                    _nodeEditor.Nodes.Clear();
-                    _nodeEditor.LoadCanvas(filePath);
-                }
-                else if (ext == ".json")
-                {
-                    // 从 JSON 加载 ChildModel 列表
-                    string json = System.IO.File.ReadAllText(filePath);
-                    var models = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChildModel>>(json);
-                    _converter.LoadFromChildModels(models);
+                    case ".stn":
+                        // 使用 STNodeEditor 原生加载
+                        _nodeEditor.Nodes.Clear();
+                        _nodeEditor.LoadCanvas(filePath);
+                        break;
+                    case ".json":
+                    {
+                        // 从 JSON 加载 ChildModel 列表
+                        var json = System.IO.File.ReadAllText(filePath);
+                        var models = Newtonsoft.Json.JsonConvert.DeserializeObject<List<ChildModel>>(json);
+                        _converter.LoadFromChildModels(models);
+                        break;
+                    }
                 }
 
                 _currentFilePath = filePath;
@@ -595,12 +718,10 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         public void DeleteSelectedNodes()
         {
             var selectedNodes = _nodeEditor.GetSelectedNode();
-            if (selectedNodes != null && selectedNodes.Length > 0)
+            if (selectedNodes == null || selectedNodes.Length <= 0) return;
+            foreach (var node in selectedNodes)
             {
-                foreach (var node in selectedNodes)
-                {
-                    _nodeEditor.Nodes.Remove(node);
-                }
+                _nodeEditor.Nodes.Remove(node);
             }
         }
 
@@ -647,6 +768,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         {
             // 可以触发标题更新事件
             // 父窗体监听此事件来更新窗口标题
+            var dirtyMark = (IsDirty || HasUnsavedConfig) ? " *" : "";
         }
 
         #endregion
@@ -1059,29 +1181,24 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
         /// <summary>
         /// 克隆节点
         /// </summary>
-        private STNode CloneNode(STNode source)
+        internal static STNode CloneNode(STNode source)
         {
-            if (source is WorkflowNodeBase workflowNode)
+            if (source is not WorkflowNodeBase workflowNode) return null;
+            // 使用工厂创建相同类型的节点
+            var newNode = WorkflowNodeFactory.CreateNode(workflowNode.StepName);
+            if (newNode == null || workflowNode.StepParameter == null) return newNode;
+            // 深度复制参数 (需要参数类实现 ICloneable 或序列化)
+            try
             {
-                // 使用工厂创建相同类型的节点
-                var newNode = WorkflowNodeFactory.CreateNode(workflowNode.StepName);
-                if (newNode != null && workflowNode.StepParameter != null)
-                {
-                    // 深度复制参数 (需要参数类实现 ICloneable 或序列化)
-                    try
-                    {
-                        var json = Newtonsoft.Json.JsonConvert.SerializeObject(workflowNode.StepParameter);
-                        var paramType = workflowNode.StepParameter.GetType();
-                        newNode.StepParameter = Newtonsoft.Json.JsonConvert.DeserializeObject(json, paramType);
-                    }
-                    catch
-                    {
-                        // 复制失败，使用默认参数
-                    }
-                }
-                return newNode;
+                var json = Newtonsoft.Json.JsonConvert.SerializeObject(workflowNode.StepParameter);
+                var paramType = workflowNode.StepParameter.GetType();
+                newNode.StepParameter = Newtonsoft.Json.JsonConvert.DeserializeObject(json, paramType);
             }
-            return null;
+            catch
+            {
+                // 复制失败，使用默认参数
+            }
+            return newNode;
         }
 
         /// <summary>
@@ -1125,42 +1242,26 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
     /// <summary>
     /// 节点选中事件参数
     /// </summary>
-    public class NodeSelectedEventArgs : EventArgs
+    public class NodeSelectedEventArgs(WorkflowNodeBase node) : EventArgs
     {
-        public WorkflowNodeBase Node { get; }
-
-        public NodeSelectedEventArgs(WorkflowNodeBase node)
-        {
-            Node = node;
-        }
+        public WorkflowNodeBase Node { get; } = node;
     }
 
     /// <summary>
     /// 节点双击事件参数
     /// </summary>
-    public class NodeDoubleClickEventArgs : EventArgs
+    public class NodeDoubleClickEventArgs(WorkflowNodeBase node) : EventArgs
     {
-        public WorkflowNodeBase Node { get; }
-        public bool Handled { get; set; }
-
-        public NodeDoubleClickEventArgs(WorkflowNodeBase node)
-        {
-            Node = node;
-            Handled = false;
-        }
+        public WorkflowNodeBase Node { get; } = node;
+        public bool Handled { get; set; } = false;
     }
 
     /// <summary>
     /// 验证结果事件参数
     /// </summary>
-    public class ValidationResultEventArgs : EventArgs
+    public class ValidationResultEventArgs(ValidationResult result) : EventArgs
     {
-        public ValidationResult Result { get; }
-
-        public ValidationResultEventArgs(ValidationResult result)
-        {
-            Result = result;
-        }
+        public ValidationResult Result { get; } = result;
     }
 
     #endregion

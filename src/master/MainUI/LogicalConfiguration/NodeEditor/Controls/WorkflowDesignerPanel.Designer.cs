@@ -1,21 +1,17 @@
-﻿using System;
-using System.Drawing;
-using System.Windows.Forms;
-using ST.Library.UI.NodeEditor;
+﻿using ST.Library.UI.NodeEditor;
 
 namespace MainUI.LogicalConfiguration.NodeEditor.Controls
 {
     partial class WorkflowDesignerPanel
     {
-        /// <summary>
-        /// Required designer variable.
+        /// <summary> 
+        /// 必需的设计器变量。
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary>
-        /// Clean up any resources being used.
+        /// <summary> 
+        /// 清理所有正在使用的资源。
         /// </summary>
-        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
         protected override void Dispose(bool disposing)
         {
             if (disposing && (components != null))
@@ -25,57 +21,49 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             base.Dispose(disposing);
         }
 
-        #region Component Designer generated code
+        #region 组件设计器生成的代码
 
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
         private void InitializeComponent()
         {
             _leftPanel = new Panel();
-            _nodeTreeView = new STNodeTreeView();
             _toolbarPanel = new Panel();
             _toolStrip = new ToolStrip();
+            _nodeTreeView = new STNodeTreeView();
             _mainSplitContainer = new SplitContainer();
             _nodeEditor = new STNodeEditor();
+
+            // ★ 新增的控件 ★
+            _rightSplitContainer = new SplitContainer();
+            _configHostPanel = new NodeConfigHostPanel();
             _propertyGrid = new STNodePropertyGrid();
+
             _leftPanel.SuspendLayout();
             _toolbarPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)_mainSplitContainer).BeginInit();
             _mainSplitContainer.Panel1.SuspendLayout();
             _mainSplitContainer.Panel2.SuspendLayout();
             _mainSplitContainer.SuspendLayout();
+
+            // ★ 新增 ★
+            ((System.ComponentModel.ISupportInitialize)_rightSplitContainer).BeginInit();
+            _rightSplitContainer.Panel1.SuspendLayout();
+            _rightSplitContainer.Panel2.SuspendLayout();
+            _rightSplitContainer.SuspendLayout();
+
             SuspendLayout();
+
             // 
             // _leftPanel
             // 
-            _leftPanel.BackColor = Color.FromArgb(35, 35, 35);
+            _leftPanel.BackColor = Color.FromArgb(45, 45, 48);
             _leftPanel.Controls.Add(_nodeTreeView);
             _leftPanel.Controls.Add(_toolbarPanel);
             _leftPanel.Dock = DockStyle.Left;
             _leftPanel.Location = new Point(0, 0);
             _leftPanel.Name = "_leftPanel";
             _leftPanel.Size = new Size(250, 700);
-            _leftPanel.TabIndex = 0;
-            // 
-            // _nodeTreeView
-            // 
-            _nodeTreeView.AllowDrop = true;
-            _nodeTreeView.BackColor = Color.FromArgb(35, 35, 35);
-            _nodeTreeView.Dock = DockStyle.Fill;
-            _nodeTreeView.FolderCountColor = Color.FromArgb(40, 255, 255, 255);
-            _nodeTreeView.ForeColor = Color.FromArgb(220, 220, 220);
-            _nodeTreeView.ItemBackColor = Color.FromArgb(45, 45, 45);
-            _nodeTreeView.ItemHoverColor = Color.FromArgb(50, 125, 125, 125);
-            _nodeTreeView.Location = new Point(0, 300);
-            _nodeTreeView.MinimumSize = new Size(100, 60);
-            _nodeTreeView.Name = "_nodeTreeView";
-            _nodeTreeView.ShowFolderCount = true;
-            _nodeTreeView.Size = new Size(250, 400);
-            _nodeTreeView.TabIndex = 0;
-            _nodeTreeView.TextBoxColor = Color.FromArgb(30, 30, 30);
-            _nodeTreeView.TitleColor = Color.FromArgb(60, 60, 60);
+            _leftPanel.TabIndex = 1;
+
             // 
             // _toolbarPanel
             // 
@@ -87,6 +75,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _toolbarPanel.Padding = new Padding(5);
             _toolbarPanel.Size = new Size(250, 300);
             _toolbarPanel.TabIndex = 1;
+
             // 
             // _toolStrip
             // 
@@ -99,24 +88,46 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _toolStrip.Name = "_toolStrip";
             _toolStrip.Size = new Size(240, 290);
             _toolStrip.TabIndex = 0;
+
+            // 
+            // _nodeTreeView
+            // 
+            _nodeTreeView.BackColor = Color.FromArgb(35, 35, 35);
+            _nodeTreeView.Dock = DockStyle.Fill;
+            _nodeTreeView.ForeColor = Color.White;
+            _nodeTreeView.InfoButtonColor = Color.DarkCyan;
+            _nodeTreeView.ItemBackColor = Color.FromArgb(45, 45, 48);
+            _nodeTreeView.ItemHoverColor = Color.FromArgb(60, 60, 60);
+            _nodeTreeView.Location = new Point(0, 300);
+            _nodeTreeView.MinimumSize = new Size(100, 60);
+            _nodeTreeView.Name = "_nodeTreeView";
+            _nodeTreeView.ShowFolderCount = true;
+            _nodeTreeView.ShowInfoButton = true;
+            _nodeTreeView.Size = new Size(250, 400);
+            _nodeTreeView.TabIndex = 0;
+            _nodeTreeView.TitleColor = Color.FromArgb(127, 37, 37, 38);
+
             // 
             // _mainSplitContainer
             // 
             _mainSplitContainer.Dock = DockStyle.Fill;
             _mainSplitContainer.Location = new Point(250, 0);
             _mainSplitContainer.Name = "_mainSplitContainer";
+
             // 
             // _mainSplitContainer.Panel1
             // 
             _mainSplitContainer.Panel1.Controls.Add(_nodeEditor);
+
             // 
-            // _mainSplitContainer.Panel2
+            // _mainSplitContainer.Panel2 - ★ 修改：使用 _rightSplitContainer ★
             // 
-            _mainSplitContainer.Panel2.Controls.Add(_propertyGrid);
+            _mainSplitContainer.Panel2.Controls.Add(_rightSplitContainer);
             _mainSplitContainer.Size = new Size(950, 700);
-            _mainSplitContainer.SplitterDistance = 766;
+            _mainSplitContainer.SplitterDistance = 750;
             _mainSplitContainer.SplitterWidth = 5;
             _mainSplitContainer.TabIndex = 0;
+
             // 
             // _nodeEditor
             // 
@@ -131,8 +142,34 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _nodeEditor.MarkForeColor = Color.FromArgb(180, 0, 0, 0);
             _nodeEditor.MinimumSize = new Size(100, 100);
             _nodeEditor.Name = "_nodeEditor";
-            _nodeEditor.Size = new Size(766, 700);
+            _nodeEditor.Size = new Size(750, 700);
             _nodeEditor.TabIndex = 0;
+
+            // 
+            // ★ _rightSplitContainer (新增) ★
+            // 
+            _rightSplitContainer.Dock = DockStyle.Fill;
+            _rightSplitContainer.Location = new Point(0, 0);
+            _rightSplitContainer.Name = "_rightSplitContainer";
+            _rightSplitContainer.Orientation = Orientation.Horizontal;
+            _rightSplitContainer.SplitterDistance = 250;
+            _rightSplitContainer.SplitterWidth = 4;
+            _rightSplitContainer.BackColor = Color.FromArgb(50, 50, 50);
+            _rightSplitContainer.Size = new Size(195, 700);
+            _rightSplitContainer.TabIndex = 0;
+
+            // 
+            // _rightSplitContainer.Panel1 - PropertyGrid
+            // 
+            _rightSplitContainer.Panel1.Controls.Add(_propertyGrid);
+            _rightSplitContainer.Panel1MinSize = 150;
+
+            // 
+            // _rightSplitContainer.Panel2 - ConfigHostPanel
+            // 
+            _rightSplitContainer.Panel2.Controls.Add(_configHostPanel);
+            _rightSplitContainer.Panel2MinSize = 200;
+
             // 
             // _propertyGrid
             // 
@@ -147,9 +184,21 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _propertyGrid.MinimumSize = new Size(120, 50);
             _propertyGrid.Name = "_propertyGrid";
             _propertyGrid.ShowTitle = true;
-            _propertyGrid.Size = new Size(179, 700);
+            _propertyGrid.Size = new Size(195, 250);
             _propertyGrid.TabIndex = 0;
             _propertyGrid.TitleColor = Color.FromArgb(127, 0, 0, 0);
+
+            // 
+            // ★ _configHostPanel (新增) ★
+            // 
+            _configHostPanel.BackColor = Color.FromArgb(40, 40, 40);
+            _configHostPanel.Dock = DockStyle.Fill;
+            _configHostPanel.Location = new Point(0, 0);
+            _configHostPanel.MinimumSize = new Size(180, 200);
+            _configHostPanel.Name = "_configHostPanel";
+            _configHostPanel.Size = new Size(195, 446);
+            _configHostPanel.TabIndex = 0;
+
             // 
             // WorkflowDesignerPanel
             // 
@@ -157,6 +206,7 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             Controls.Add(_leftPanel);
             Name = "WorkflowDesignerPanel";
             Size = new Size(1200, 700);
+
             _leftPanel.ResumeLayout(false);
             _toolbarPanel.ResumeLayout(false);
             _toolbarPanel.PerformLayout();
@@ -164,150 +214,31 @@ namespace MainUI.LogicalConfiguration.NodeEditor.Controls
             _mainSplitContainer.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)_mainSplitContainer).EndInit();
             _mainSplitContainer.ResumeLayout(false);
+
+            // ★ 新增 ★
+            _rightSplitContainer.Panel1.ResumeLayout(false);
+            _rightSplitContainer.Panel2.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)_rightSplitContainer).EndInit();
+            _rightSplitContainer.ResumeLayout(false);
+
             ResumeLayout(false);
-        }
-
-
-        private void AddToolbarButtons()
-        {
-            // 设置工具栏样式
-            _toolStrip.BackColor = Color.FromArgb(45, 45, 48);
-            _toolStrip.ForeColor = Color.White;
-            //_toolStrip.Renderer = new ToolStripProfessionalRenderer(new CustomColorTable());
-
-            // 新建
-            var btnNew = new ToolStripButton("新建工作流", null, OnNewClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,  // 垂直工具栏按钮宽度
-                Height = 35,
-                ToolTipText = "新建工作流 (Ctrl+N)"
-            };
-
-            // 打开
-            var btnOpen = new ToolStripButton("打开工作流", null, OnOpenClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "打开工作流 (Ctrl+O)"
-            };
-
-            // 保存
-            var btnSave = new ToolStripButton("保存工作流", null, OnSaveClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "保存工作流 (Ctrl+S)"
-            };
-
-            _toolStrip.Items.Add(btnNew);
-            _toolStrip.Items.Add(btnOpen);
-            _toolStrip.Items.Add(btnSave);
-            _toolStrip.Items.Add(new ToolStripSeparator());
-
-            // 验证
-            var btnValidate = new ToolStripButton("验证工作流", null, OnValidateClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "验证工作流"
-            };
-
-            // 自动布局
-            var btnAutoLayout = new ToolStripButton("自动布局", null, OnAutoLayoutClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "自动排列节点"
-            };
-
-            _toolStrip.Items.Add(btnValidate);
-            _toolStrip.Items.Add(btnAutoLayout);
-
-            // 新增：缩放控制按钮
-            _toolStrip.Items.Add(new ToolStripSeparator());
-
-            // 缩放显示标签
-            var zoomLabelItem = new ToolStripLabel("缩放: 100%")
-            {
-                Name = "_zoomLabelItem",
-                AutoSize = false,
-                Width = 230,
-                Height = 25,
-                TextAlign = ContentAlignment.MiddleLeft,
-                ForeColor = Color.White
-            };
-            _toolStrip.Items.Add(zoomLabelItem);
-
-            var btnZoomIn = new ToolStripButton("放大", null, OnZoomInClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "放大 (Ctrl+加号)"
-            };
-
-            var btnZoomOut = new ToolStripButton("缩小", null, OnZoomOutClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "缩小 (Ctrl+减号)"
-            };
-
-            var btnZoomReset = new ToolStripButton("重置缩放", null, OnZoomResetClick)
-            {
-                DisplayStyle = ToolStripItemDisplayStyle.ImageAndText,
-                ImageAlign = ContentAlignment.MiddleLeft,
-                TextAlign = ContentAlignment.MiddleLeft,
-                AutoSize = false,
-                Width = 230,
-                Height = 35,
-                ToolTipText = "重置缩放 (Ctrl+0)"
-            };
-
-            _toolStrip.Items.Add(btnZoomIn);
-            _toolStrip.Items.Add(btnZoomOut);
-            _toolStrip.Items.Add(btnZoomReset);
         }
 
         #endregion
 
-        #region 控件字段声明
+        #region 控件声明
 
-        private SplitContainer _mainSplitContainer;
-        private SplitContainer _rightSplitContainer;
-        private STNodeEditor _nodeEditor;
-        private STNodeTreeView _nodeTreeView;
-        private STNodePropertyGrid _propertyGrid;
-        private Panel _toolbarPanel;
         private Panel _leftPanel;
+        private Panel _toolbarPanel;
         private ToolStrip _toolStrip;
+        private STNodeTreeView _nodeTreeView;
+        private SplitContainer _mainSplitContainer;
+        private STNodeEditor _nodeEditor;
+        private STNodePropertyGrid _propertyGrid;
+
+        // ★ 新增的控件 ★
+        private SplitContainer _rightSplitContainer;
+        private NodeConfigHostPanel _configHostPanel;
 
         #endregion
     }
